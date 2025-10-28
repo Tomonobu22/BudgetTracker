@@ -1,0 +1,46 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.vs/
+*.vscode/
+
+# Visual Studio Temporary Files
+*.log
+*.vspscc
+*.vsscc
+*.pdb
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Local DB
+*.mdf
+*.ldf
+*.sqlite
+*.db
+
+# Publish output
+publish/
+wwwroot/lib/
+
+# Resharper / Rider Files
+_ReSharper*/
+*.DotSettings.user
+
+# MacOS
+.DS_Store
+
+# Docker
+docker-compose.override.yml
+*.env
+
+# ASP.NET Core runtime files
+appsettings.*.json
