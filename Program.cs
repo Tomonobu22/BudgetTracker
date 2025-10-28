@@ -1,7 +1,24 @@
+using BudgetTracker.Data;
+using BudgetTracker.Repositories.Implementations;
+using BudgetTracker.Repositories.Interfaces;
+using BudgetTracker.Services.Implementations;
+using BudgetTracker.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Dependency Injection for Repositories and Services
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IIncomeAppService, IncomeAppService>();
+builder.Services.AddScoped<IExpenseAppService, ExpenseAppService>();
+builder.Services.AddScoped<IInvestmentAppService, InvestmentAppService>();
+
 
 var app = builder.Build();
 
