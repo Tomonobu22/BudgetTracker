@@ -15,10 +15,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Dependency Injection for Repositories and Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IInvestmentRepository, InvestmentRepository>();
 builder.Services.AddScoped<IIncomeAppService, IncomeAppService>();
 builder.Services.AddScoped<IExpenseAppService, ExpenseAppService>();
 builder.Services.AddScoped<IInvestmentAppService, InvestmentAppService>();
+builder.Services.AddScoped<IReportAppService, ReportAppService>();
 
+// Add Identity services 
+builder.Services.AddDefaultIdentity<Microsoft.AspNetCore.Identity.IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<AppDbContext>();
 
 var app = builder.Build();
 
