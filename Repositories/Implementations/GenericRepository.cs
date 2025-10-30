@@ -15,28 +15,21 @@ namespace BudgetTracker.Repositories.Implementations
             _context = context;
             _dbSet = _context.Set<T>(); // Get the DbSet for the entity type T
         }
-        public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await _dbSet.ToListAsync();
-        }
-        public async Task<T> GetByIdAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
-        public async Task AddAsync(T entity)
+        public virtual async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
+        public virtual async Task<T> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
+        public virtual async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
+            await _context.SaveChangesAsync();
         }
-        public void Update(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
-        public void Delete(T entity)
+        public virtual async Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
-        }
-        public async Task SaveChangesAsync()
-        {
             await _context.SaveChangesAsync();
         }
     }

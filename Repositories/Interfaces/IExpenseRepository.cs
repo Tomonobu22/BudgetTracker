@@ -4,6 +4,6 @@ namespace BudgetTracker.Repositories.Interfaces
 {
     public interface IExpenseRepository : IGenericRepository<Expense>
     {
-        Task<decimal> GetTotalExpenseAsync(int userId, DateTime startDate, DateTime endDate);
+        Task<decimal> GetTotalExpenseAsync(string userId, DateTime startDate, DateTime endDate);
     }
 }

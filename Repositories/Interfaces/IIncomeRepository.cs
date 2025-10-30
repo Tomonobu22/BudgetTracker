@@ -4,6 +4,7 @@ namespace BudgetTracker.Repositories.Interfaces
 {
     public interface IIncomeRepository : IGenericRepository<Income>
     {
-        Task<decimal> GetTotalIncomeAsync(int userId, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Income>> GetAllByUserAsync(string userId);
+        Task<decimal> GetTotalIncomeAsync(string userId, DateTime startDate, DateTime endDate);
     }
 }

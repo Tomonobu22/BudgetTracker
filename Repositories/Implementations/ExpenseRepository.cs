@@ -9,7 +9,7 @@ namespace BudgetTracker.Repositories.Implementations
     {
         public ExpenseRepository(AppDbContext context) : base(context) { }
 
-        public async Task<decimal> GetTotalExpenseAsync(int userId, DateTime startDate, DateTime endDate)
+        public async Task<decimal> GetTotalExpenseAsync(string userId, DateTime startDate, DateTime endDate)
         {
             return await _dbSet.Where(e => e.UserId == userId && e.DateIncurred >= startDate && e.DateIncurred <= endDate).SumAsync(e => e.Amount);
         }

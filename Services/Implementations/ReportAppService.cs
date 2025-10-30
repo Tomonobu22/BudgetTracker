@@ -21,7 +21,7 @@ namespace BudgetTracker.Services.Implementations
         }
 
 
-        public async Task<ReportSummaryViewModel> GetSummaryReportAsync(int userId, DateTime startDate, DateTime endDate)
+        public async Task<ReportSummaryViewModel> GetSummaryReportAsync(string userId, DateTime startDate, DateTime endDate)
         {
             if (startDate > endDate)
                 throw new ArgumentException("Start date cannot be after end date.");

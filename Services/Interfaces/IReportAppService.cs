@@ -4,6 +4,6 @@ namespace BudgetTracker.Services.Interfaces
 {
     public interface IReportAppService
     {
-        Task<ReportSummaryViewModel> GetSummaryReportAsync (int userId, DateTime startDate, DateTime endDate);
+        Task<ReportSummaryViewModel> GetSummaryReportAsync (string userId, DateTime startDate, DateTime endDate);
     }
 }

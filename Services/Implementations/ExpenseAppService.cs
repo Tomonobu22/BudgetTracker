@@ -22,20 +22,17 @@ namespace BudgetTracker.Services.Implementations
         public async Task AddAsync(Expense expense)
         {
             await _expenseRepository.AddAsync(expense);
-            await _expenseRepository.SaveChangesAsync();
         }
         public async Task UpdateAsync(Expense expense)
         {
-            _expenseRepository.Update(expense);
-            await _expenseRepository.SaveChangesAsync();
+            await _expenseRepository.UpdateAsync(expense);
         }
         public async Task DeleteAsync(int id)
         {
             var expense = await _expenseRepository.GetByIdAsync(id);
             if (expense != null)
             {
-                _expenseRepository.Delete(expense);
-                await _expenseRepository.SaveChangesAsync();
+                await _expenseRepository.DeleteAsync(expense);
             }
         }
     }

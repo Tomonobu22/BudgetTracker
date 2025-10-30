@@ -4,6 +4,8 @@ using BudgetTracker.Repositories.Interfaces;
 using BudgetTracker.Services.Implementations;
 using BudgetTracker.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using BudgetTracker.Mapping;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +26,10 @@ builder.Services.AddScoped<IInvestmentAppService, InvestmentAppService>();
 builder.Services.AddScoped<IReportAppService, ReportAppService>();
 
 // Add Identity services 
-builder.Services.AddDefaultIdentity<Microsoft.AspNetCore.Identity.IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddDefaultIdentity<Microsoft.AspNetCore.Identity.IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<AppDbContext>();
+
+// Register AutoMapper
+builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 
@@ -40,6 +44,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -49,5 +54,5 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
+app.MapRazorPages(); // important for Identity pages
 app.Run();

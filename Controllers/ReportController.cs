@@ -15,7 +15,7 @@ namespace BudgetTracker.Controllers
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
-            var userId = 1; // Replace with actual user ID retrieval logic
+            var userId = "1"; // Replace with actual user ID retrieval logic
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1).AddDays(-1);
 
