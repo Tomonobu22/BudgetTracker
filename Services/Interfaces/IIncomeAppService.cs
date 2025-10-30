@@ -1,5 +1,4 @@
 ﻿using BudgetTracker.DTOs;
-using BudgetTracker.Models;
 
 namespace BudgetTracker.Services.Interfaces
 {
@@ -7,12 +6,9 @@ namespace BudgetTracker.Services.Interfaces
     {
         Task<IEnumerable<IncomeDto>> GetAllByUserAsync(string userId);
         Task CreateAsync(IncomeDto dto, string userId);
-        Task<Income> GetByIdAsync(int id, string userId);
-        Task UpdateAsync(Income income);
-        Task DeleteAsync(int id);
-
-        // Review
-        Task<IEnumerable<Income>> GetAllAsync();
-        Task AddAsync(Income income);
+        Task<IncomeDto> GetByIdAsync(int id, string userId);
+        Task UpdateAsync(IncomeDto dto, string userId);
+        Task DeleteAsync(int id, string userId);
+        Task AddAsync(IncomeDto dto, string userId);
     }
 }

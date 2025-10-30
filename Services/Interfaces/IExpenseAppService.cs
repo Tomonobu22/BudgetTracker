@@ -1,13 +1,13 @@
-﻿using BudgetTracker.Models;
+﻿using BudgetTracker.DTOs;
 
 namespace BudgetTracker.Services.Interfaces
 {
     public interface IExpenseAppService
     {
-        Task<IEnumerable<Expense>> GetAllAsync();
-        Task<Expense> GetByIdAsync(int id);
-        Task AddAsync(Expense expense);
-        Task UpdateAsync(Expense expense);
-        Task DeleteAsync(int id);
+        Task<IEnumerable<ExpenseDto>> GetAllByUserAsync(string userId);
+        Task<ExpenseDto> GetByIdAsync(int id, string userId);
+        Task CreateAsync(ExpenseDto expense, string userId);
+        Task UpdateAsync(ExpenseDto  expense, string userId);
+        Task DeleteAsync(int id, string userId);
     }
 }

@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using BudgetTracker.Models;
+﻿using BudgetTracker.DTOs;
 using BudgetTracker.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BudgetTracker.Controllers
 {
+    [Authorize]
     public class InvestmentController : Controller
     {
         private readonly IInvestmentAppService _investmentAppService;
@@ -19,10 +17,13 @@ namespace BudgetTracker.Controllers
             _investmentAppService = investmentAppService;
         }
 
+        private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         // GET: Investment
         public async Task<IActionResult> Index()
         {
-            return View(await _investmentAppService.GetAllAsync());
+            var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
+            return View(investments);
         }
 
         // GET: Investment/Details/5
@@ -33,7 +34,7 @@ namespace BudgetTracker.Controllers
                 return NotFound();
             }
 
-            var investment = await _investmentAppService.GetByIdAsync(id.Value);
+            var investment = await _investmentAppService.GetByIdAsync(id.Value, CurrentUserId);
             if (investment == null)
             {
                 return NotFound();
@@ -53,14 +54,14 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Amount,DateInvested,CurrentValue")] Investment investment)
+        public async Task<IActionResult> Create([Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _investmentAppService.AddAsync(investment);
-                return RedirectToAction(nameof(Index));
+                return View(investment);
             }
-            return View(investment);
+            await _investmentAppService.CreateAsync(investment, CurrentUserId);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Investment/Edit/5
@@ -71,7 +72,7 @@ namespace BudgetTracker.Controllers
                 return NotFound();
             }
 
-            var investment = await _investmentAppService.GetByIdAsync(id.Value);
+            var investment = await _investmentAppService.GetByIdAsync(id.Value, CurrentUserId);
             if (investment == null)
             {
                 return NotFound();
@@ -84,33 +85,20 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Amount,DateInvested,CurrentValue")] Investment investment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
         {
             if (id != investment.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _investmentAppService.UpdateAsync(investment);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!InvestmentExists(investment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(investment);
             }
-            return View(investment);
+
+            await _investmentAppService.UpdateAsync(investment, CurrentUserId);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Investment/Delete/5
@@ -121,7 +109,7 @@ namespace BudgetTracker.Controllers
                 return NotFound();
             }
 
-            var investment = await _investmentAppService.GetByIdAsync(id.Value);
+            var investment = await _investmentAppService.GetByIdAsync(id.Value, CurrentUserId);
             if (investment == null)
             {
                 return NotFound();
@@ -135,13 +123,13 @@ namespace BudgetTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _investmentAppService.DeleteAsync(id);
+            await _investmentAppService.DeleteAsync(id, CurrentUserId);
             return RedirectToAction(nameof(Index));
         }
 
         private bool InvestmentExists(int id)
         {
-            return _investmentAppService.GetByIdAsync(id).Result != null;
+            return _investmentAppService.GetByIdAsync(id, CurrentUserId).Result != null;
         }
     }
 }

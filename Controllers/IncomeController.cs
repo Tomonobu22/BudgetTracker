@@ -7,41 +7,41 @@ using System.Security.Claims;
 
 namespace BudgetTracker.Controllers
 {
+    [Authorize]
     public class IncomeController : Controller
     {
         private readonly IIncomeAppService _incomeAppService;
-        private readonly IMapper _mapper;
 
-        public IncomeController(IIncomeAppService incomeAppService, IMapper mapper)
+        public IncomeController(IIncomeAppService incomeAppService)
         {
             _incomeAppService = incomeAppService;
-            _mapper = mapper;
         }
+
+        private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // GET: Income
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var incomes = await _incomeAppService.GetAllByUserAsync(userId);
+            var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             return View(incomes);
         }
 
         // GET: Income/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var income = await _incomeAppService.GetByIdAsync(id.Value);
-        //    if (income == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var income = _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
+            if (income == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(income);
-        //}
+            return View(income);
+        }
 
         // GET: Income/Create
         public IActionResult Create()
@@ -60,27 +60,25 @@ namespace BudgetTracker.Controllers
             {
                 return View(income);
             }
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _incomeAppService.CreateAsync(income, userId);
+            await _incomeAppService.CreateAsync(income, CurrentUserId);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Income/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var income = await _incomeAppService.GetByIdAsync(id.Value);
-        //    if (income == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(income);
-        //}
+            var income = _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
+            if (income == null)
+            {
+                return NotFound();
+            }
+            return View(income);
+        }
 
         // POST: Income/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -90,8 +88,6 @@ namespace BudgetTracker.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Source,Amount,DateReceived")] IncomeDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (id != dto.Id)
             {
                 return NotFound();
@@ -102,44 +98,39 @@ namespace BudgetTracker.Controllers
                 return View(dto);
             }
 
-            var income = await _incomeAppService.GetByIdAsync(id, userId);
-            if (income == null) return NotFound();
-
-            _mapper.Map(dto, income); // Update model from DTO
-            await _incomeAppService.UpdateAsync(income);
+            await _incomeAppService.UpdateAsync(dto, CurrentUserId);
             return RedirectToAction(nameof(Index));
         }
 
         // GET: Income/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var income = await _incomeAppService.GetByIdAsync(id.Value);
-        //    if (income == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var income = await _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
+            if (income == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(income);
-        //}
+            return View(income);
+        }
 
         // POST: Income/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _incomeAppService.DeleteAsync(id);
+            await _incomeAppService.DeleteAsync(id, CurrentUserId);
             return RedirectToAction(nameof(Index));
         }
 
         private bool IncomeExists(int id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return _incomeAppService.GetByIdAsync(id, userId).Result != null;
+            return _incomeAppService.GetByIdAsync(id, CurrentUserId).Result != null;
         }
     }
 }

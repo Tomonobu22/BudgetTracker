@@ -1,4 +1,6 @@
-﻿using BudgetTracker.Models;
+﻿using AutoMapper;
+using BudgetTracker.DTOs;
+using BudgetTracker.Models;
 using BudgetTracker.Repositories.Interfaces;
 using BudgetTracker.Services.Interfaces;
 
@@ -6,31 +8,45 @@ namespace BudgetTracker.Services.Implementations
 {
     public class ExpenseAppService : IExpenseAppService
     {
-        private IGenericRepository<Expense> _expenseRepository;
-        public ExpenseAppService(IGenericRepository<Expense> expenseRepository)
+        private readonly IExpenseRepository _expenseRepository;
+        private readonly IMapper _mapper;
+
+        public ExpenseAppService(IExpenseRepository expenseRepository, IMapper mapper)
         {
             _expenseRepository = expenseRepository;
+            _mapper = mapper;
         }
-        public async Task<IEnumerable<Expense>> GetAllAsync()
+        public async Task<IEnumerable<ExpenseDto>> GetAllByUserAsync(string userId)
         {
-            return await _expenseRepository.GetAllAsync();
+            var expenses = await _expenseRepository.GetAllByUserAsync(userId);
+            return _mapper.Map<IEnumerable<ExpenseDto>>(expenses);
         }
-        public async Task<Expense> GetByIdAsync(int id)
-        {
-            return await _expenseRepository.GetByIdAsync(id);
-        }
-        public async Task AddAsync(Expense expense)
-        {
-            await _expenseRepository.AddAsync(expense);
-        }
-        public async Task UpdateAsync(Expense expense)
-        {
-            await _expenseRepository.UpdateAsync(expense);
-        }
-        public async Task DeleteAsync(int id)
+
+        public async Task<ExpenseDto> GetByIdAsync(int id, string userId)
         {
             var expense = await _expenseRepository.GetByIdAsync(id);
-            if (expense != null)
+            if (expense != null && expense.UserId == userId)
+            {
+                return _mapper.Map<ExpenseDto>(expense);
+            }
+            throw new KeyNotFoundException("Expense not found or access denied.");
+        }
+        public async Task CreateAsync(ExpenseDto expenseDto, string userId)
+        {
+            var expense = _mapper.Map<Expense>(expenseDto);
+            expense.UserId = userId;
+            await _expenseRepository.AddAsync(expense);
+        }
+        public async Task UpdateAsync(ExpenseDto expenseDto, string userId)
+        {
+            var expense = _mapper.Map<Expense>(expenseDto);
+            expense.UserId = userId;
+            await _expenseRepository.UpdateAsync(expense);
+        }
+        public async Task DeleteAsync(int id, string userId)
+        {
+            var expense = await _expenseRepository.GetByIdAsync(id);
+            if (expense != null && expense.UserId == userId)
             {
                 await _expenseRepository.DeleteAsync(expense);
             }

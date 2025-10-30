@@ -22,19 +22,19 @@ namespace BudgetTracker.Repositories.Implementations
                 .SumAsync(i => i.Amount);
         }
 
-        public async Task AddAsync(Income income)
+        public override async Task AddAsync(Income income)
         {
             _dbSet.Add(income);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Income income)
+        public override async Task UpdateAsync(Income income)
         {
             _dbSet.Update(income);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Income income)
+        public override async Task DeleteAsync(Income income)
         {
             _dbSet.Remove(income);
             await _context.SaveChangesAsync();

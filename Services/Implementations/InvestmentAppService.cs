@@ -1,4 +1,6 @@
-﻿using BudgetTracker.Models;
+﻿using AutoMapper;
+using BudgetTracker.DTOs;
+using BudgetTracker.Models;
 using BudgetTracker.Repositories.Interfaces;
 using BudgetTracker.Services.Interfaces;
 
@@ -6,31 +8,46 @@ namespace BudgetTracker.Services.Implementations
 {
     public class InvestmentAppService : IInvestmentAppService
     {
-        private IGenericRepository<Investment> _investmentRepository;
-        public InvestmentAppService(IGenericRepository<Investment> investmentRepository)
+        private readonly IInvestmentRepository _investmentRepository;
+        private readonly IMapper _mapper;
+
+        public InvestmentAppService(IInvestmentRepository investmentRepository, IMapper mapper)
         {
             _investmentRepository = investmentRepository;
+            _mapper = mapper;
         }
-        public async Task<IEnumerable<Investment>> GetAllAsync()
+
+        public async Task<IEnumerable<InvestmentDto>> GetAllByUserAsync(string userId)
         {
-            return await _investmentRepository.GetAllAsync();
+            var investments = await _investmentRepository.GetAllByUserAsync(userId);
+            return _mapper.Map<IEnumerable<InvestmentDto>>(investments);
         }
-        public async Task<Investment> GetByIdAsync(int id)
+        public async Task CreateAsync(InvestmentDto dto, string userId)
         {
-            return await _investmentRepository.GetByIdAsync(id);
-        }
-        public async Task AddAsync(Investment investment)
-        {
+            var investment = _mapper.Map<Investment>(dto);
+            investment.UserId = userId;
             await _investmentRepository.AddAsync(investment);
         }
-        public async Task UpdateAsync(Investment investment)
-        {
-            await _investmentRepository.UpdateAsync(investment);
-        }
-        public async Task DeleteAsync(int id)
+        public async Task<InvestmentDto> GetByIdAsync(int id, string userId)
         {
             var investment = await _investmentRepository.GetByIdAsync(id);
-            if (investment != null)
+            if (investment != null && investment.UserId == userId)
+            {
+                return _mapper.Map<InvestmentDto>(investment);
+            }
+            throw new KeyNotFoundException("Investment not found or access denied.");
+        }
+
+        public async Task UpdateAsync(InvestmentDto investment, string userId)
+        {
+            var entity = _mapper.Map<Investment>(investment);
+            entity.UserId = userId;
+            await _investmentRepository.UpdateAsync(entity);
+        }
+        public async Task DeleteAsync(int id, string userId)
+        {
+            var investment = await _investmentRepository.GetByIdAsync(id);
+            if (investment != null && investment.UserId == userId)
             {
                 await _investmentRepository.DeleteAsync(investment);
             }

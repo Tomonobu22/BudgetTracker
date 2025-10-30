@@ -1,8 +1,10 @@
 ﻿using BudgetTracker.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BudgetTracker.Controllers
 {
+    [Authorize]
     public class ReportController : Controller
     {
         private readonly IReportAppService _reportAppService;
