@@ -1,45 +1,45 @@
 ﻿@model BudgetTracker.DTOs.InvestmentDto
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Investment Record";
 }
 
-<h1>Delete</h1>
+<div class="card border-danger">
+    <div class="card-header bg-danger text-white">
+        Confirm Delete
+    </div>
+    <div class="card-body">
+        <p class="fw-bold">Are you sure you want to delete this investment record?</p>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Investment</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Amount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Amount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateInvested)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateInvested)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CurrentValue)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CurrentValue)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label text-end pe-3"><strong> @Html.DisplayNameFor(model => model.Type):</strong></label>
+            <div class="col-sm-9 text-danger">
+                @Model.Type
+            </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label text-end pe-3"><strong>@Html.DisplayNameFor(model => model.Amount):</strong></label>
+            <div class="col-sm-9 text-danger">
+                @Model.Amount.ToString("C")
+            </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label text-end pe-3"><strong>@Html.DisplayNameFor(model => model.DateInvested):</strong></label>
+            <div class="col-sm-9 text-danger">
+                @Model.DateInvested.ToString("yyyy-MM-dd")
+            </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+            <label class="col-sm-3 col-form-label text-end pe-3"><strong> @Html.DisplayNameFor(model => model.CurrentValue):</strong></label>
+            <div class="col-sm-9 text-danger">
+                @Model.CurrentValue.ToString("C")
+            </div>
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
 </div>

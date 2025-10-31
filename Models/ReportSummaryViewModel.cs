@@ -7,5 +7,6 @@
         public decimal TotalIncome { get; set; }
         public decimal TotalInvestments { get; set; }
         public decimal NetBalance => TotalIncome - TotalExpenses;
+        public int Year { get; set; }
     }
 }

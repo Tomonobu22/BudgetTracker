@@ -13,12 +13,27 @@ namespace BudgetTracker.Repositories.Implementations
         {
             return await _dbSet
                 .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.DateIncurred)
                 .ToListAsync();
         }
 
         public async Task<decimal> GetTotalExpenseAsync(string userId, DateTime startDate, DateTime endDate)
         {
             return await _dbSet.Where(e => e.UserId == userId && e.DateIncurred >= startDate && e.DateIncurred <= endDate).SumAsync(e => e.Amount);
+        }
+
+        public async Task<List<decimal>> GetMonthlyExpenseAsync(string userId, int year)
+        {
+            var monthlyExpense = new List<decimal>(new decimal[12]);
+            var expenses = await _dbSet
+                .Where(e => e.UserId == userId && e.DateIncurred.Year == year)
+                .ToListAsync();
+            foreach (var expense in expenses)
+            {
+                int monthIndex = expense.DateIncurred.Month - 1;
+                monthlyExpense[monthIndex] += expense.Amount;
+            }
+            return monthlyExpense;
         }
 
         public override async Task AddAsync(Expense expense)

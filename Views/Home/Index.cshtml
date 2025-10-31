@@ -2,11 +2,158 @@
     ViewData["Title"] = "Home Page";
 }
 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['line']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Callback that creates and populates a data table,
+    // instantiates the pie chart, passes in the data and
+    // draws it.
+    function drawChart() {
+
+      // Create the data table.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Month');
+      data.addColumn('number', 'Income');
+      data.addColumn('number', 'Expense');
+
+      data.addRows([
+        @for (int i = 0; i < Model.MonthlyIncome.Count; i++)
+        {
+            @: ['@Model.MonthNames[i]', @Model.MonthlyIncome[i], @Model.MonthlyExpenses[i]],
+        }
+      ]);
+
+      // Set chart options
+      var options = {
+          chart:{
+            title: 'Monthly Cash Flow - @Model.Year',
+          },
+          width: 900,
+          height: 500,
+          colors: ['#4CAF50', '#F44336'], // Green for income, red for expense
+          backgroundColor: '#f8f9fa', // Light background
+          chartArea: { width: '80%', height: '70%' },
+          hAxis: {
+            title: 'Month',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true }
+          },
+          vAxis: {
+            title: 'Amount ($)',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true },
+            gridlines: { color: '#e0e0e0' },
+            minValue: 0
+          },
+          legend: {
+            position: 'bottom',
+            textStyle: { fontSize: 13 }
+          }
+      };
+
+      // Instantiate and draw our chart, passing in some options.
+      var chart = new google.charts.Line(document.getElementById('cash_flow_chart_div'));
+      chart.draw(data, google.charts.Line.convertOptions(options));
+
+      // Create additional table for income - expense difference
+      var diffData = new google.visualization.DataTable();
+      diffData.addColumn('string', 'Month');
+      diffData.addColumn('number', 'Difference');
+
+      @for (int i = 0; i < Model.MonthlyIncome.Count; i++)
+      {
+          @: diffData.addRow(['@Model.MonthNames[i]', @Model.MonthlyIncome[i] - @Model.MonthlyExpenses[i]]);
+      }
+                
+      var diffOptions = {
+          chart: {
+            title: 'Monthly Income - Expense Difference - @Model.Year',
+          },
+          width: 900,
+          height: 500,
+          colors: ['#1E88E5'], // Blue tone for net income
+          backgroundColor: '#f8f9fa', // Light background
+          chartArea: { width: '80%', height: '70%' },
+          hAxis: {
+            title: 'Month',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true }
+          },
+          vAxis: {
+            title: 'Net Amount ($)',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true },
+            gridlines: { color: '#e0e0e0' },
+            minValue: 0
+          },
+          legend: { position: 'none' }
+      };
+      // Instantiate and draw our chart, passing in some options.
+      var diffChart = new google.charts.Line(document.getElementById('diff_chart_div'));
+      diffChart.draw(diffData, google.charts.Line.convertOptions(diffOptions));
+
+      // Create additional table for investments
+      var invData = new google.visualization.DataTable();
+      invData.addColumn('string', 'Month');
+      invData.addColumn('number', 'Investments');
+
+      @for (int i = 0; i < Model.MonthlyInvestments.Count; i++)
+      {
+        @: invData.addRow(['@Model.MonthNames[i]', @Model.MonthlyInvestments[i]]);
+      }
+
+      var invOptions = {
+          chart: {
+            title: 'Investment Growth - @Model.Year',
+          },
+          width: 900,
+          height: 500,
+          colors: ['#26A69A'], // Teal/blue-green for investments
+          backgroundColor: '#f8f9fa', // Light background
+          chartArea: { width: '80%', height: '70%'},
+          hAxis: {
+            title: 'Month',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true }
+          },
+          vAxis: {
+            title: 'Investment Value ($)',
+            titleTextStyle: { color: '#333', fontSize: 14, bold: true },
+            gridlines: { color: '#e0e0e0' },
+            minValue: 0
+          },
+          legend: { position: 'none' }, 
+          lineWidth: 3,
+          pointSize: 5
+      };
+      // Instantiate and draw our chart, passing in some options.
+      var invChart = new google.charts.Line(document.getElementById('inv_chart_div'));
+      invChart.draw(invData, google.charts.Line.convertOptions(invOptions));
+    } 
+</script>
+<style>
+    /* Center the chart and add styling */
+    .chart_container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        width: 100%;
+    }
+
+    .chart_div {
+        text-align: center;
+    }
+</style>
+
 <div class="row">
     <div class="col-md-4">
         <div class="card text-white bg-success mb-3">
             <div class="card-body">
-                <h5 class="card-title">Total Income</h5>
+                <h5 class="card-title">Total Income @Model.Year</h5>
                 <p class="card-text">@Model.TotalIncome.ToString("C")</p>
                 <a href="@Url.Action("Index", "Income")" class="btn btn-light btn-sm">View Details</a>
             </div>
@@ -15,7 +162,7 @@
     <div class="col-md-4">
         <div class="card text-white bg-danger mb-3">
             <div class="card-body">
-                <h5 class="card-title">Total Expenses</h5>
+                <h5 class="card-title">Total Expenses @Model.Year</h5>
                 <p class="card-text">@Model.TotalExpenses.ToString("C")</p>
                 <a href="@Url.Action("Index", "Expense")" class="btn btn-light btn-sm">View Details</a>
             </div>
@@ -24,10 +171,20 @@
     <div class="col-md-4">
         <div class="card text-white bg-info mb-3">
             <div class="card-body">
-                <h5 class="card-title">Investments</h5>
+                <h5 class="card-title">Investments @Model.Year</h5>
                 <p class="card-text">@Model.TotalInvestments.ToString("C")</p>
                 <a href="@Url.Action("Index", "Investment")" class="btn btn-light btn-sm">View Details</a>
             </div>
         </div>
+    </div>
+
+    <div class="chart_container">
+        <div class="chart_div" id="cash_flow_chart_div"></div>
+    </div>
+    <div class="chart_container" style="margin-top: 30px;">
+        <div class="chart_div" id="diff_chart_div"></div>
+    </div>
+    <div class="chart_container" style="margin-top: 30px;">
+        <div class="chart_div" id="inv_chart_div"></div>
     </div>
 </div>
