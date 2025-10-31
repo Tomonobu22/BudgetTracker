@@ -28,8 +28,13 @@ packages/
 *.db
 
 # Publish output
+Properties/PublishProfiles/*.pubxml
+Properties/PublishProfiles/*.pubxml.user
+Properties/PublishProfiles/profile.json
 publish/
 wwwroot/lib/
+
+Properties/ServiceDependencies
 
 # Resharper / Rider Files
 _ReSharper*/
