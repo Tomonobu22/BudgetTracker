@@ -34,7 +34,7 @@ namespace BudgetTracker.Controllers
                 return NotFound();
             }
 
-            var income = _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
+            var income = await _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
             if (income == null)
             {
                 return NotFound();
@@ -72,7 +72,7 @@ namespace BudgetTracker.Controllers
                 return NotFound();
             }
 
-            var income = _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
+            var income = await _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
             if (income == null)
             {
                 return NotFound();

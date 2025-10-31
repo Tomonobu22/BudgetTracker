@@ -22,10 +22,7 @@ namespace BudgetTracker.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var startDate = new DateTime(DateTime.Now.Year, 1, 1);
-            var endDate = DateTime.Now;
-
-            var model = await _reportAppService.GetSummaryReportAsync(CurrentUserId, startDate, endDate);
+            var model = await _reportAppService.GetMonthlySummaryAsync(CurrentUserId, DateTime.Now.Year);
             return View(model);
         }
 

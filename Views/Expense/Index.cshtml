@@ -1,16 +1,23 @@
 ﻿@model IEnumerable<BudgetTracker.DTOs.ExpenseDto>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Expense Dashboard";
+    var totalExpenses = Model.Sum(e => e.Amount);
 }
 
-<h1>Index</h1>
+<h1>Expense Dashboard</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="Create">Add New Expense</a>
+</div>
+
+<div class="alert alert-danger">
+    <strong>Total Expenses:</strong> @totalExpenses.ToString("C")
+</div>
+
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Category)
@@ -24,7 +31,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.DateIncurred)
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -43,9 +50,9 @@
                 @Html.DisplayFor(modelItem => item.DateIncurred)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
