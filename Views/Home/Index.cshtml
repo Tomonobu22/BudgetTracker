@@ -2,7 +2,32 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Income</h5>
+                <p class="card-text">@Model.TotalIncome.ToString("C")</p>
+                <a href="@Url.Action("Index", "Income")" class="btn btn-light btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <p class="card-text">@Model.TotalExpenses.ToString("C")</p>
+                <a href="@Url.Action("Index", "Expense")" class="btn btn-light btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Investments</h5>
+                <p class="card-text">@Model.TotalInvestments.ToString("C")</p>
+                <a href="@Url.Action("Index", "Investment")" class="btn btn-light btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
 </div>
