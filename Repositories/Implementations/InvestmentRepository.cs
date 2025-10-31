@@ -13,6 +13,7 @@ namespace BudgetTracker.Repositories.Implementations
         {
             return await _dbSet
                 .Where(i => i.UserId == userId)
+                .OrderByDescending(i => i.DateInvested)
                 .ToListAsync();
         }
 
@@ -20,6 +21,20 @@ namespace BudgetTracker.Repositories.Implementations
         {
             return await _dbSet.Where(i => i.UserId == userId && i.DateInvested >= startDate && i.DateInvested <= endDate)
                 .SumAsync(i => i.Amount);
+        }
+
+        public async Task<List<decimal>> GetMonthlyInvestmentAsync(string userId, int year)
+        {
+            var monthlyInvestment = new List<decimal>(new decimal[12]);
+            var investments = await _dbSet
+                .Where(i => i.UserId == userId && i.DateInvested.Year == year)
+                .ToListAsync();
+            foreach (var investment in investments)
+            {
+                int monthIndex = investment.DateInvested.Month - 1;
+                monthlyInvestment[monthIndex] += investment.Amount;
+            }
+            return monthlyInvestment;
         }
 
         public override async Task AddAsync(Investment investment)

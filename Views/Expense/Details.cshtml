@@ -1,42 +1,42 @@
 ﻿@model BudgetTracker.DTOs.ExpenseDto
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Expense Details";
 }
 
-<h1>Details</h1>
+<div class="card border-secondary">
+    <div class="card-header bg-secondary text-white">
+        Expense Details
+    </div>
+    <div class="card-body">
+        <div class="mb-3 row d-flex align-items-center">
+            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.Category) </strong></label>
+            <div class="col-sm-9">
+                @Model.Category
+            </div>
+        </div>
+        <div class="mb-3 row d-flex align-items-center">
+            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.Description) </strong></label>
+            <div class="col-sm-9">
+                @Model.Description
+            </div>
+        </div>
+        <div class="mb-3 row d-flex align-items-center">
+            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.Amount)</strong></label>
+            <div class="col-sm-9">
+                @Model.Amount.ToString("C")
+            </div>
+        </div>
+        <div class="mb-3 row d-flex align-items-center">
+            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.DateIncurred)</strong></label>
+            <div class="col-sm-9">
+                @Model.DateIncurred.ToString("yyyy-MM-dd")
+            </div>
+        </div>
 
-<div>
-    <h4>Expense</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Amount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Amount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateIncurred)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateIncurred)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+        <div class="mt-3">
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
 </div>

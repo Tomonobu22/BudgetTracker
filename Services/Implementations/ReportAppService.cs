@@ -34,7 +34,27 @@ namespace BudgetTracker.Services.Implementations
             {
                 TotalIncome = totalIncome,
                 TotalExpenses = totalExpenses,
-                TotalInvestments = totalInvestments
+                TotalInvestments = totalInvestments,
+                Year = startDate.Year
+            };
+        }
+
+        public async Task<MonthlySummaryViewModel> GetMonthlySummaryAsync(string userId, int year)
+        {
+            if (year < 2000 || year > DateTime.Now.Year)
+            {
+                throw new ArgumentException("Year is out of valid range.");
+            }
+            var monthlyIncome = await _incomeRepository.GetMonthlyIncomeAsync(userId, year);
+            var monthlyExpense = await _expenseRepository.GetMonthlyExpenseAsync(userId, year);
+            var monthlyInvestment = await _investmentRepository.GetMonthlyInvestmentAsync(userId, year);
+
+            return new MonthlySummaryViewModel
+            {
+                Year = year,
+                MonthlyIncome = monthlyIncome,
+                MonthlyExpenses = monthlyExpense,
+                MonthlyInvestments = monthlyInvestment
             };
         }
     }

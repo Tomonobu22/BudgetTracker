@@ -1,16 +1,21 @@
 ﻿@model IEnumerable<BudgetTracker.DTOs.InvestmentDto>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Investment Dashboard";
 }
 
-<h1>Index</h1>
+<h1>Investment Dashboard</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="Create">Add New Investment</a>
+</div>
+
+<div class="alert alert-info">
+    <strong>Total Investments:</strong> @Model.Sum(i => i.Amount).ToString("C")
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Type)
@@ -19,33 +24,25 @@
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DateInvested)
+                Date Invested
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CurrentValue)
+                Current Value
             </th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
+            <td>@item.Type</td>
+            <td>@item.Amount.ToString("C")</td>
+            <td>@item.DateInvested.ToShortDateString()</td>
+            <td>@item.CurrentValue.ToString("C")</td>
             <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateInvested)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CurrentValue)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }
