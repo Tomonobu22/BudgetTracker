@@ -13,6 +13,7 @@ namespace BudgetTracker.Repositories.Implementations
         {
             return await _dbSet
                 .Where(e => e.UserId == userId)
+                .Include(e => e.Tag)
                 .OrderByDescending(e => e.DateIncurred)
                 .ToListAsync();
         }

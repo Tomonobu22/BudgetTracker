@@ -10,9 +10,9 @@
     </div>
     <div class="card-body">
         <div class="mb-3 row d-flex align-items-center">
-            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.Category) </strong></label>
+            <label class="col-sm-3 col-form-label"><strong>@Html.DisplayNameFor(model => model.Tag.Name) </strong></label>
             <div class="col-sm-9">
-                @Model.Category
+                @Model.Tag?.Name
             </div>
         </div>
         <div class="mb-3 row d-flex align-items-center">

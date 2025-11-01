@@ -23,7 +23,7 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
-            var source = incomes.Select(i => i.Source).Distinct().ToList();
+            var source = incomes.Select(i => i.Tag?.Name).Distinct().ToList();
             ViewBag.Sources = source;
             return View(incomes);
         }
@@ -34,7 +34,7 @@ namespace BudgetTracker.Controllers
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(source))
             {
-                incomes = incomes.Where(i => i.Source.Contains(source, StringComparison.OrdinalIgnoreCase));
+                incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.Contains(source, StringComparison.OrdinalIgnoreCase));
             }
             if (startDate.HasValue)
             {

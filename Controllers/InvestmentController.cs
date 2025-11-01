@@ -23,7 +23,7 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
-            var types = investments.Select(i => i.Type).Distinct().ToList();
+            var types = investments.Select(i => i.Tag?.Name).Distinct().ToList();
             ViewBag.Types = types;
             return View(investments);
         }
@@ -34,7 +34,7 @@ namespace BudgetTracker.Controllers
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(type))
             {
-                investments = investments.Where(i => i.Type.Contains(type, StringComparison.OrdinalIgnoreCase));
+                investments = investments.Where(i => i.Tag != null && i.Tag.Name.Contains(type, StringComparison.OrdinalIgnoreCase));
             }
             if (startDate.HasValue)
             {

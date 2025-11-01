@@ -13,7 +13,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Source</td>
+                <td>@item.Tag?.Name</td>
                 <td>@item.Amount.ToString("C")</td>
                 <td>@item.DateReceived.ToShortDateString()</td>
                 <td>

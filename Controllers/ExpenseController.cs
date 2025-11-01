@@ -32,7 +32,7 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
-            var categories = expenses.Select(e => e.Category).Distinct().ToList();
+            var categories = expenses.Select(e => e.Tag?.Name).Distinct().ToList();
             ViewBag.Categories = categories;
             return View(expenses);
         }
@@ -43,7 +43,7 @@ namespace BudgetTracker.Controllers
             var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(category))
             {
-                expenses = expenses.Where(e => e.Category.Contains(category, StringComparison.OrdinalIgnoreCase)).ToList();
+                expenses = expenses.Where(e => e.Tag != null && e.Tag.Name.Contains(category, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             if (!string.IsNullOrEmpty(description))
             {

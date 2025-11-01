@@ -5,7 +5,7 @@
     <thead class="table-dark">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                Category
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -24,7 +24,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Category)
+                    @Html.DisplayFor(modelItem => item.Tag.Name)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)

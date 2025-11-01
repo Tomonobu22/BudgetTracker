@@ -4,7 +4,7 @@
     <thead class="table-dark">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Type)
+                Type
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Amount)
@@ -22,7 +22,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Type</td>
+                <td>@item.Tag?.Name</td>
                 <td>@item.Amount.ToString("C")</td>
                 <td>@item.DateInvested.ToShortDateString()</td>
                 <td>@item.CurrentValue.ToString("C")</td>
