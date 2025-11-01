@@ -35,6 +35,29 @@ namespace BudgetTracker.Controllers
             return View(expenses);
         }
 
+        // GET: Filtered Expense
+        public async Task<IActionResult> Filter(string? category, string? description, DateTime? startDate, DateTime? endDate)
+        {
+            var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
+            if (!string.IsNullOrEmpty(category))
+            {
+                expenses = expenses.Where(e => e.Category.Contains(category, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            if (!string.IsNullOrEmpty(description))
+            {
+                expenses = expenses.Where(e => e.Description.Contains(description, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            if (startDate.HasValue)
+            {
+                expenses = expenses.Where(e => e.DateIncurred >= startDate.Value).ToList();
+            }
+            if (endDate.HasValue)
+            {
+                expenses = expenses.Where(e => e.DateIncurred <= endDate.Value).ToList();
+            }
+            return PartialView("_ExpenseTablePartial", expenses);
+        }
+
         // GET: Expense/Details/5
         public async Task<IActionResult> Details(int? id)
         {

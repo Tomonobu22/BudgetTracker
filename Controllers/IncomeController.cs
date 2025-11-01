@@ -26,6 +26,26 @@ namespace BudgetTracker.Controllers
             return View(incomes);
         }
 
+        // GET: Filtered Income
+        public async Task<IActionResult> Filter(string? source, DateTime? startDate, DateTime? endDate)
+        {
+            var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
+            if (!string.IsNullOrEmpty(source))
+            {
+                incomes = incomes.Where(i => i.Source.Contains(source, StringComparison.OrdinalIgnoreCase));
+            }
+            if (startDate.HasValue)
+            {
+                incomes = incomes.Where(i => i.DateReceived >= startDate.Value).ToList();
+            }
+            if (endDate.HasValue)
+            {
+                incomes = incomes.Where(i => i.DateReceived <= endDate.Value).ToList();
+            }
+
+            return PartialView("_IncomeTablePartial", incomes);
+        }
+
         // GET: Income/Details/5
         public async Task<IActionResult> Details(int? id)
         {

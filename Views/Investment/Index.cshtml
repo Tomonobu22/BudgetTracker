@@ -14,37 +14,85 @@
     <strong>Total Investments:</strong> @Model.Sum(i => i.Amount).ToString("C")
 </div>
 
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Amount)
-            </th>
-            <th>
-                Date Invested
-            </th>
-            <th>
-                Current Value
-            </th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@item.Type</td>
-            <td>@item.Amount.ToString("C")</td>
-            <td>@item.DateInvested.ToShortDateString()</td>
-            <td>@item.CurrentValue.ToString("C")</td>
-            <td>
-                <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-funnel-fill text-primary"></i> Filter
+        </h5>
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Investment Type</label>
+                <input type="text" id="type" class="form-control" placeholder="Enter type" />
+                @*                 <select id="source" class="form-select">
+                    <option value="">All Sources</option>
+                    @foreach (var s in (SelectList)ViewBag.SourceList)
+                    {
+                        <option value="@s.Text">@s.Text</option>
+                    }
+                </select> *@
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">From Date</label>
+                <input type="date" id="startDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">To Date</label>
+                <input type="date" id="endDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3 d-flex justify-content-end">
+                <button id="filterBtn" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+                <button id="clearBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="investmentTableContainer">
+    <partial name="_InvestmentTablePartial" model="Model" />
+</div>
+
+@section Scripts {
+    <script>
+        // Function to load filtered data via AJAX
+        function loadFilteredData() {
+               var type = $('#type').val();
+               var startDate = $('#startDate').val();
+               var endDate = $('#endDate').val();
+
+               $.ajax({
+                   url: '@Url.Action("Filter", "Investment")',
+                   type: 'GET',
+                   data: { type: type, startDate: startDate, endDate: endDate },
+                   success: function (result) {
+                       $('#investmentTableContainer').html(result);
+                   },
+                   error: function () {
+                       alert('Error loading data.');
+                   }
+               });
+           }
+
+        // Trigger filter
+        $('#filterBtn').on('click', function (e) {
+            e.preventDefault();
+            loadFilteredData();
+        });
+
+        // Clear filters
+        $('#clearBtn').on('click', function (e) {
+            e.preventDefault();
+            $('#type').val('');
+            $('#startDate').val('');
+            $('#endDate').val('');
+            loadFilteredData();
+        });
+    </script>
 }
-    </tbody>
-</table>

@@ -26,6 +26,26 @@ namespace BudgetTracker.Controllers
             return View(investments);
         }
 
+        // GET: Filtered Investment
+        public async Task<IActionResult> Filter(string? type, DateTime? startDate, DateTime? endDate)
+        {
+            var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
+            if (!string.IsNullOrEmpty(type))
+            {
+                investments = investments.Where(i => i.Type.Contains(type, StringComparison.OrdinalIgnoreCase));
+            }
+            if (startDate.HasValue)
+            {
+                investments = investments.Where(i => i.DateInvested >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                investments = investments.Where(i => i.DateInvested <= endDate.Value);
+            }
+            return PartialView("_InvestmentTablePartial", investments);
+        }
+
+
         // GET: Investment/Details/5
         public async Task<IActionResult> Details(int? id)
         {
