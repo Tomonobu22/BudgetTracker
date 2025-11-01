@@ -23,6 +23,8 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
+            var types = investments.Select(i => i.Type).Distinct().ToList();
+            ViewBag.Types = types;
             return View(investments);
         }
 

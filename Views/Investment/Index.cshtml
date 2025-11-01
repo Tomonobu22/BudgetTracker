@@ -23,14 +23,13 @@
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-semibold">Investment Type</label>
-                <input type="text" id="type" class="form-control" placeholder="Enter type" />
-                @*                 <select id="source" class="form-select">
-                    <option value="">All Sources</option>
-                    @foreach (var s in (SelectList)ViewBag.SourceList)
+                <select id="type" class="form-select">
+                    <option value="">All Types</option>
+                    @foreach (var s in ViewBag.Types)
                     {
-                        <option value="@s.Text">@s.Text</option>
+                        <option value="@s">@s</option>
                     }
-                </select> *@
+                </select>
             </div>
 
             <div class="col-md-3">

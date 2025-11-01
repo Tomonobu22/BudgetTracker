@@ -32,6 +32,8 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
+            var categories = expenses.Select(e => e.Category).Distinct().ToList();
+            ViewBag.Categories = categories;
             return View(expenses);
         }
 

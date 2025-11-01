@@ -24,14 +24,13 @@
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-semibold">Expense Category</label>
-                <input type="text" id="category" class="form-control" placeholder="Enter category" />
-                @*                 <select id="source" class="form-select">
-                    <option value="">All Sources</option>
-                    @foreach (var s in (SelectList)ViewBag.SourceList)
+                <select id="category" class="form-select">
+                    <option value="">All Categories</option>
+                    @foreach (var s in ViewBag.Categories)
                     {
-                        <option value="@s.Text">@s.Text</option>
+                        <option value="@s">@s</option>
                     }
-                </select> *@
+                </select>
             </div>
 
             <div class="col-md-3">
