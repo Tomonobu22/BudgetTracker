@@ -12,9 +12,9 @@
             <input type="hidden" asp-for="Id" />
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label asp-for="Tag.Name" class="control-label"></label>
-                    <input asp-for="Tag.Name" class="form-control" />
-                    <span asp-validation-for="Tag.Name" class="text-danger"></span>
+                    <label asp-for="TagId" class="control-label">Type</label>
+                    <select asp-for="TagId" class="form-control" asp-items="ViewBag.Tags"></select>
+                    <span asp-validation-for="TagId" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Amount" class="control-label"></label>
@@ -24,12 +24,12 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label asp-for="DateInvested" class="control-label"></label>
+                    <label asp-for="DateInvested" class="control-label">Date Invested</label>
                     <input asp-for="DateInvested" class="form-control" type="date"/>
                     <span asp-validation-for="DateInvested" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="CurrentValue" class="control-label"></label>
+                    <label asp-for="CurrentValue" class="control-label">Current Value</label>
                     <input asp-for="CurrentValue" class="form-control" />
                     <span asp-validation-for="CurrentValue" class="text-danger"></span>
                 </div>

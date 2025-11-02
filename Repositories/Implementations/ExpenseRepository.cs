@@ -37,6 +37,12 @@ namespace BudgetTracker.Repositories.Implementations
             return monthlyExpense;
         }
 
+        public override async Task<Expense?> GetByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(e => e.Tag)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
         public override async Task AddAsync(Expense expense)
         {
             _dbSet.Add(expense);

@@ -38,6 +38,13 @@ namespace BudgetTracker.Repositories.Implementations
             return monthlyIncome;
         }
 
+        public override async Task<Income?> GetByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(i => i.Tag)
+                .FirstOrDefaultAsync(i => i.Id == id);
+        }
+
         public override async Task AddAsync(Income income)
         {
             _dbSet.Add(income);

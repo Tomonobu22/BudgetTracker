@@ -2,6 +2,7 @@
 using BudgetTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -11,10 +12,12 @@ namespace BudgetTracker.Controllers
     public class InvestmentController : Controller
     {
         private readonly IInvestmentAppService _investmentAppService;
+        private readonly ITagAppService _tagAppService;
 
-        public InvestmentController(IInvestmentAppService investmentAppService)
+        public InvestmentController(IInvestmentAppService investmentAppService, ITagAppService tagAppService)
         {
             _investmentAppService = investmentAppService;
+            _tagAppService = tagAppService;
         }
 
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,7 +37,7 @@ namespace BudgetTracker.Controllers
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(type))
             {
-                investments = investments.Where(i => i.Tag != null && i.Tag.Name.Contains(type, StringComparison.OrdinalIgnoreCase));
+                investments = investments.Where(i => i.Tag != null && i.Tag.Name.ToLower() == type.ToLower());
             }
             if (startDate.HasValue)
             {
@@ -68,6 +71,8 @@ namespace BudgetTracker.Controllers
         // GET: Investment/Create
         public IActionResult Create()
         {
+            var tags = _tagAppService.GetAllTagsAsync("Investment", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
 
@@ -76,8 +81,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = "Investment"
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                investment.TagId = newId;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(investment);
@@ -99,6 +115,8 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
+            var tags = _tagAppService.GetAllTagsAsync("Investment", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(investment);
         }
 
@@ -107,7 +125,7 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
         {
             if (id != investment.Id)
             {

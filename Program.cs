@@ -20,10 +20,12 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IInvestmentRepository, InvestmentRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IIncomeAppService, IncomeAppService>();
 builder.Services.AddScoped<IExpenseAppService, ExpenseAppService>();
 builder.Services.AddScoped<IInvestmentAppService, InvestmentAppService>();
 builder.Services.AddScoped<IReportAppService, ReportAppService>();
+builder.Services.AddScoped<ITagAppService, TagAppService>();
 
 // Add Identity services 
 builder.Services.AddDefaultIdentity<Microsoft.AspNetCore.Identity.IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<AppDbContext>();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens.Experimental;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace BudgetTracker.Controllers
     public class ExpenseController : Controller
     {
         private readonly IExpenseAppService _expenseAppService;
+        private readonly ITagAppService _tagAppService;
         private readonly IMapper _mapper;
 
-        public ExpenseController(IExpenseAppService expenseAppService, IMapper mapper)
+        public ExpenseController(IExpenseAppService expenseAppService, ITagAppService tagAppService, IMapper mapper)
         {
             _expenseAppService = expenseAppService;
+            _tagAppService = tagAppService;
             _mapper = mapper;
         }
 
@@ -43,19 +46,19 @@ namespace BudgetTracker.Controllers
             var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(category))
             {
-                expenses = expenses.Where(e => e.Tag != null && e.Tag.Name.Contains(category, StringComparison.OrdinalIgnoreCase)).ToList();
+                expenses = expenses.Where(e => e.Tag != null && e.Tag.Name.ToLower() == category.ToLower());
             }
             if (!string.IsNullOrEmpty(description))
             {
-                expenses = expenses.Where(e => e.Description.Contains(description, StringComparison.OrdinalIgnoreCase)).ToList();
+                expenses = expenses.Where(e => e.Description.Contains(description, StringComparison.OrdinalIgnoreCase));
             }
             if (startDate.HasValue)
             {
-                expenses = expenses.Where(e => e.DateIncurred >= startDate.Value).ToList();
+                expenses = expenses.Where(e => e.DateIncurred >= startDate.Value);
             }
             if (endDate.HasValue)
             {
-                expenses = expenses.Where(e => e.DateIncurred <= endDate.Value).ToList();
+                expenses = expenses.Where(e => e.DateIncurred <= endDate.Value);
             }
             return PartialView("_ExpenseTablePartial", expenses);
         }
@@ -80,6 +83,8 @@ namespace BudgetTracker.Controllers
         // GET: Expense/Create
         public IActionResult Create()
         {
+            var tags = _tagAppService.GetAllTagsAsync("Expense", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
 
@@ -88,8 +93,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Category,Description,Amount,DateIncurred")] ExpenseDto expense)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Description,Amount,DateIncurred")] ExpenseDto expense, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = "Expense"
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                expense.TagId = newId;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(expense);
@@ -111,6 +127,9 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
+
+            var tags = _tagAppService.GetAllTagsAsync("Expense", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(expense);
         }
 
@@ -119,7 +138,7 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Category,Description,Amount,DateIncurred")] ExpenseDto dto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Description,Amount,DateIncurred")] ExpenseDto dto)
         {
             if (id != dto.Id)
             {

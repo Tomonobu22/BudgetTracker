@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using BudgetTracker.DTOs;
+using BudgetTracker.Services.Implementations;
 using BudgetTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace BudgetTracker.Controllers
@@ -11,10 +13,12 @@ namespace BudgetTracker.Controllers
     public class IncomeController : Controller
     {
         private readonly IIncomeAppService _incomeAppService;
+        private readonly ITagAppService _tagAppService;
 
-        public IncomeController(IIncomeAppService incomeAppService)
+        public IncomeController(IIncomeAppService incomeAppService, ITagAppService tagAppService)
         {
             _incomeAppService = incomeAppService;
+            _tagAppService = tagAppService;
         }
 
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -34,15 +38,15 @@ namespace BudgetTracker.Controllers
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(source))
             {
-                incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.Contains(source, StringComparison.OrdinalIgnoreCase));
+                incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.ToLower() == source.ToLower());
             }
             if (startDate.HasValue)
             {
-                incomes = incomes.Where(i => i.DateReceived >= startDate.Value).ToList();
+                incomes = incomes.Where(i => i.DateReceived >= startDate.Value);
             }
             if (endDate.HasValue)
             {
-                incomes = incomes.Where(i => i.DateReceived <= endDate.Value).ToList();
+                incomes = incomes.Where(i => i.DateReceived <= endDate.Value);
             }
 
             return PartialView("_IncomeTablePartial", incomes);
@@ -68,6 +72,8 @@ namespace BudgetTracker.Controllers
         // GET: Income/Create
         public IActionResult Create()
         {
+            var tags = _tagAppService.GetAllTagsAsync("Income", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
 
@@ -76,8 +82,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Source,Amount,DateReceived")] IncomeDto income)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateReceived")] IncomeDto income, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = "Income"
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                income.TagId = newId;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(income);
@@ -99,6 +116,8 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
+            var tags = _tagAppService.GetAllTagsAsync("Income", CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(income);
         }
 
@@ -108,7 +127,7 @@ namespace BudgetTracker.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Source,Amount,DateReceived")] IncomeDto dto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateReceived")] IncomeDto dto)
         {
             if (id != dto.Id)
             {

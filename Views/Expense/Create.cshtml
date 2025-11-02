@@ -10,16 +10,19 @@
     </div>
     <div class="card-body">
         <form asp-action="Create">
+            <input type="hidden" id="newTagName" name="newTagName" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label text-end pe-3"><strong>Category:</strong></label>
-                <div class="col-sm-9">
-                    <input asp-for="Tag.Name" class="form-control" placeholder="Enter category"></input>
-                    <span asp-validation-for="Tag.Name" class="text-danger"></span>
+                <div class="col-sm-9 input-group" style="width:75%;">
+                    <select asp-for="TagId" class="form-control" asp-items="ViewBag.Tags"></select>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addTypeModal">
+                        + Add New
+                    </button>
                 </div>
+                <span asp-validation-for="TagId" class="text-danger"></span>
             </div>
-
             <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label text-end pe-3"><strong>Description:</strong></label>
                 <div class="col-sm-9">
@@ -49,6 +52,7 @@
                 <a asp-action="Index" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
+        @await Html.PartialAsync("_AddTypeModal")
     </div>
 </div>
 
