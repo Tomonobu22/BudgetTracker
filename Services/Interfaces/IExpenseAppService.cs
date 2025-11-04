@@ -9,5 +9,6 @@ namespace BudgetTracker.Services.Interfaces
         Task CreateAsync(ExpenseDto expense, string userId);
         Task UpdateAsync(ExpenseDto  expense, string userId);
         Task DeleteAsync(int id, string userId);
+        Task<bool>HasExpensesWithTagAsync(int tagId);
     }
 }

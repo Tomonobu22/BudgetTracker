@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BudgetTracker.DTOs;
+using BudgetTracker.Enums;
 using BudgetTracker.Services.Implementations;
 using BudgetTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -72,7 +73,7 @@ namespace BudgetTracker.Controllers
         // GET: Income/Create
         public IActionResult Create()
         {
-            var tags = _tagAppService.GetAllTagsAsync("Income", CurrentUserId);
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
@@ -89,7 +90,7 @@ namespace BudgetTracker.Controllers
                 var newTag = new TagDto
                 {
                     Name = newTagName,
-                    Context = "Income"
+                    Context = RecordType.Income
                 };
                 var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
                 income.TagId = newId;
@@ -116,7 +117,7 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
-            var tags = _tagAppService.GetAllTagsAsync("Income", CurrentUserId);
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(income);
         }
@@ -127,8 +128,19 @@ namespace BudgetTracker.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateReceived")] IncomeDto dto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateReceived")] IncomeDto dto, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = RecordType.Income
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                dto.TagId = newId;
+            }
+
             if (id != dto.Id)
             {
                 return NotFound();

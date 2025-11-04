@@ -38,6 +38,12 @@ namespace BudgetTracker.Services.Implementations
             throw new KeyNotFoundException("Investment not found or access denied.");
         }
 
+        public async Task<bool> HasInvestmentsWithTagAsync(int tagId)
+        {
+            var allInvestments = await _investmentRepository.GetAllAsync();
+            return allInvestments.Any(i => i.TagId == tagId);
+        }
+
         public async Task UpdateAsync(InvestmentDto investment, string userId)
         {
             var entity = _mapper.Map<Investment>(investment);

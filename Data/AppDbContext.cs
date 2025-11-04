@@ -16,5 +16,15 @@ namespace BudgetTracker.Data
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Investment> Investments { get; set; }
         public DbSet<Tag> Tags { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Configure relationships and constraints if needed
+            builder.Entity<Tag>()
+                .Property(t => t.Context)
+                .HasConversion<string>();
+        }
     }
 }

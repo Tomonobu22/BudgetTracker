@@ -1,0 +1,34 @@
+﻿@model BudgetTracker.DTOs.TagDto
+
+@{
+    ViewData["Title"] = "Edit Tag";
+}
+
+<div class="card border-primary">
+    <div class="card-header bg-primary text-white">Edit Tag</div>
+    <div class="card-body">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    @* Just show the value, cannot be edited *@
+                    <label asp-for="Context" class="control-label"></label>
+                    <input asp-for="Context" class="form-control" readonly />
+                    <span asp-validation-for="Context" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

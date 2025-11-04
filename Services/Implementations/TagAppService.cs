@@ -1,4 +1,6 @@
-﻿using BudgetTracker.DTOs;
+﻿using AutoMapper;
+using BudgetTracker.DTOs;
+using BudgetTracker.Enums;
 using BudgetTracker.Models;
 using BudgetTracker.Repositories.Interfaces;
 using BudgetTracker.Services.Interfaces;
@@ -8,9 +10,11 @@ namespace BudgetTracker.Services.Implementations
     public class TagAppService : ITagAppService
     {
         private readonly ITagRepository _tagRepository;
-        public TagAppService(ITagRepository tagRepository)
+        private readonly IMapper _mapper;
+        public TagAppService(ITagRepository tagRepository, IMapper mapper)
         {
             _tagRepository = tagRepository;
+            _mapper = mapper;
         }
 
         public async Task RemoveTagAsync(int tagId, string userId)
@@ -18,9 +22,10 @@ namespace BudgetTracker.Services.Implementations
             await _tagRepository.RemoveTagAsync(tagId, userId);
         }
 
-        public async Task<IEnumerable<Tag>> GetAllTagsAsync(string context, string userId)
+        public async Task<IEnumerable<TagDto>> GetAllTagsAsync(RecordType context, string userId)
         {
-            return await _tagRepository.GetAllTagsAsync(context, userId);
+            var tags = await _tagRepository.GetAllTagsAsync(context, userId);
+            return _mapper.Map<IEnumerable<TagDto>>(tags);
         }
         public async Task<int> CreateAsync(TagDto tagDto, string userId)
         {
@@ -33,14 +38,26 @@ namespace BudgetTracker.Services.Implementations
                 return foundTag.Id;
             }
 
-            var tag = new Tag
-            {
-                Name = tagDto.Name,
-                Context = tagDto.Context,
-                UserId = userId
-            };
+            var tag = _mapper.Map<Tag>(tagDto);
+            tag.UserId = userId;
             await _tagRepository.CreateAsync(tag);
             return tag.Id;
+        }
+        public async Task<int> UpdateAsync(TagDto tagDto, string userId)
+        {
+            var tag = _mapper.Map<Tag>(tagDto);
+            tag.UserId = userId;
+            await _tagRepository.UpdateAsync(tag);
+            return tag.Id;
+        }
+        public async Task<TagDto> GetTagByIdAsync(int tagId, string userId)
+        {
+            var tag = await _tagRepository.GetTagByIdAsync(tagId);
+            if (tag == null || tag.UserId != userId)
+            {
+                throw new KeyNotFoundException("Tag not found");
+            }
+            return _mapper.Map<TagDto>(tag);
         }
     }
 }

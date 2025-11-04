@@ -1,4 +1,5 @@
 ﻿using BudgetTracker.DTOs;
+using BudgetTracker.Enums;
 using BudgetTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,7 +72,7 @@ namespace BudgetTracker.Controllers
         // GET: Investment/Create
         public IActionResult Create()
         {
-            var tags = _tagAppService.GetAllTagsAsync("Investment", CurrentUserId);
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
@@ -88,7 +89,7 @@ namespace BudgetTracker.Controllers
                 var newTag = new TagDto
                 {
                     Name = newTagName,
-                    Context = "Investment"
+                    Context = RecordType.Investment
                 };
                 var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
                 investment.TagId = newId;
@@ -115,7 +116,7 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
-            var tags = _tagAppService.GetAllTagsAsync("Investment", CurrentUserId);
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(investment);
         }
@@ -125,8 +126,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = RecordType.Investment
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                investment.TagId = newId;
+            }
+
             if (id != investment.Id)
             {
                 return NotFound();

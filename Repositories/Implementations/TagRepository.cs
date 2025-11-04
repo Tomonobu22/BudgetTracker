@@ -1,4 +1,5 @@
 ﻿using BudgetTracker.Data;
+using BudgetTracker.Enums;
 using BudgetTracker.Models;
 using BudgetTracker.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -31,10 +32,33 @@ namespace BudgetTracker.Repositories.Implementations
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<Tag>> GetAllTagsAsync(string context, string userId)
+        public Task<IEnumerable<Tag>> GetAllTagsAsync(RecordType context, string userId)
         {
-            var tags = _dbSet.Where(t => t.Context == context && t.UserId == userId);
-            return Task.FromResult<IEnumerable<Tag>>(tags.ToList());
+            if (context == RecordType.Empty)
+            {
+                var allTags = _dbSet.Where(t => t.UserId == userId);
+                return Task.FromResult<IEnumerable<Tag>>(allTags.ToList());
+            }
+            else
+            {
+                var tags = _dbSet.Where(t => t.Context == context && t.UserId == userId);
+                return Task.FromResult<IEnumerable<Tag>>(tags.ToList());
+            }
+        }
+        public Task<Tag?> GetTagByIdAsync(int tagId)
+        {
+            return _dbSet.FirstOrDefaultAsync(t => t.Id == tagId);
+        }
+        public async Task UpdateAsync(Tag tag)
+        {
+            var existingTag = await _dbSet.FirstOrDefaultAsync(t => t.Id == tag.Id);
+            if (existingTag != null)
+            {
+                existingTag.Name = tag.Name;
+                existingTag.Context = tag.Context;
+                _dbSet.Update(existingTag);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

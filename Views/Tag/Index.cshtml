@@ -1,0 +1,84 @@
+﻿@model IEnumerable<BudgetTracker.DTOs.TagDto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Tags Dashboard</h1>
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="Create">Add New Tag</a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-funnel-fill text-primary"></i> Filter
+        </h5>
+
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Tag Context</label>
+                <select id="context" class="form-select">
+                    <option value="Empty">All Contexts</option>
+                    <option value="Income">Income</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Investment">Investment</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Tag Name</label>
+                <input type="text" id="tagName" class="form-control" placeholder="Enter tag name" />
+            </div>
+
+            <div class="col-md-2 d-flex justify-content-end">
+                <button id="filterBtn" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+                <button id="clearBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tagTableContainer">
+    @await Html.PartialAsync("_TagTablePartial", Model)
+</div>
+
+@section Scripts {
+    <script>
+        // Function to load filtered data via AJAX
+        function loadFilteredData() {
+               var context = $('#context').val();
+               var tagName = $('#tagName').val();
+
+               $.ajax({
+                   url: '@Url.Action("Filter")',
+                   type: 'GET',
+                   data: { context: context, tagName: tagName },
+                   success: function (result) {
+                       $('#tagTableContainer').html(result);
+                   },
+                   error: function () {
+                       alert('Error loading data.');
+                   }
+               });
+           }
+
+        // Trigger filter
+        $('#filterBtn').on('click', function (e) {
+            e.preventDefault();
+            loadFilteredData();
+        });
+
+        // Clear filters
+        $('#clearBtn').on('click', function (e) {
+            e.preventDefault();
+            $('#context').val('');
+            $('#tagName').val('');
+            loadFilteredData();
+        });
+    </script>
+}

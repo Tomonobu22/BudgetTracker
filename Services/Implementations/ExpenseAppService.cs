@@ -31,6 +31,13 @@ namespace BudgetTracker.Services.Implementations
             }
             throw new KeyNotFoundException("Expense not found or access denied.");
         }
+
+        public async Task<bool>HasExpensesWithTagAsync(int tagId)
+        { 
+            var allExpenses = await _expenseRepository.GetAllAsync();
+            return allExpenses.Any(e => e.TagId == tagId);
+
+        }
         public async Task CreateAsync(ExpenseDto expenseDto, string userId)
         {
             var expense = _mapper.Map<Expense>(expenseDto);

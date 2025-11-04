@@ -1,9 +1,11 @@
-﻿namespace BudgetTracker.DTOs
+﻿using BudgetTracker.Enums;
+
+namespace BudgetTracker.DTOs
 {
     public class TagDto
     {
+        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public string Context { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
+        public RecordType Context { get; set; } = RecordType.Empty;
     }
 }
