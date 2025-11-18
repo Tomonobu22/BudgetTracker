@@ -1,5 +1,12 @@
 ﻿@model IEnumerable<BudgetTracker.DTOs.InvestmentDto>
 
+@{
+    var totalFilteredInvestment = Model.Sum(i => i.Amount);
+}
+<div class="alert alert-info">
+    <strong>Total <span id="filteredLabel" class="d-none">Filtered</span> Investment:</strong> @totalFilteredInvestment.ToString("C")
+</div>
+
 <table class="table table-striped table-hover">
     <thead class="table-dark">
         <tr>

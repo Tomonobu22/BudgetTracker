@@ -10,10 +10,6 @@
     <a class="btn btn-primary" asp-action="Create">Add New Investment</a>
 </div>
 
-<div class="alert alert-info">
-    <strong>Total Investments:</strong> @Model.Sum(i => i.Amount).ToString("C")
-</div>
-
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         <h5 class="card-title mb-3">
@@ -60,18 +56,28 @@
 
 @section Scripts {
     <script>
-        // Function to load filtered data via AJAX
-        function loadFilteredData() {
-               var type = $('#type').val();
-               var startDate = $('#startDate').val();
-               var endDate = $('#endDate').val();
+        var currentType = $('#type').val();
+        var currentStartDate = $('#startDate').val();
+        var currentEndDate = $('#endDate').val();
 
+        // Function to load filtered data via AJAX
+        function loadFilteredData(type, startDate, endDate) {
                $.ajax({
                    url: '@Url.Action("Filter", "Investment")',
                    type: 'GET',
                    data: { type: type, startDate: startDate, endDate: endDate },
                    success: function (result) {
                        $('#investmentTableContainer').html(result);
+                       // Update current filter values
+                        currentType = type;
+                        currentStartDate = startDate;
+                        currentEndDate = endDate;
+                        // Toggle "Filtered" label visibility
+                        if (type || startDate || endDate) {
+                            $('#filteredLabel').removeClass("d-none");
+                        } else {
+                            $('#filteredLabel').addClass("d-none");
+                        }
                    },
                    error: function () {
                        alert('Error loading data.');
@@ -82,7 +88,13 @@
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
-            loadFilteredData();
+            var type = $('#type').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            if (type === currentType && startDate === currentStartDate && endDate === currentEndDate) {
+                return; // No changes in filters
+            }
+            loadFilteredData(type, startDate, endDate);
         });
 
         // Clear filters
@@ -91,7 +103,12 @@
             $('#type').val('');
             $('#startDate').val('');
             $('#endDate').val('');
-            loadFilteredData();
+
+            // No filters to clear.
+            if (!currentType && !currentStartDate && !currentEndDate) {
+                return;
+            }
+            loadFilteredData('', '', '');
         });
     </script>
 }

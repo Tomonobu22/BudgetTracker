@@ -30,7 +30,7 @@ namespace BudgetTracker.Controllers
         // GET: Tag
         public async Task<IActionResult> Index()
         {
-            var tags = await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId);
+            var tags = (await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId)).OrderBy(t => t.Name);
             return View(tags);
         }
 

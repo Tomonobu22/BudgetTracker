@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Expense Dashboard";
-    var totalExpenses = Model.Sum(e => e.Amount);
 }
 
 <h1>Expense Dashboard</h1>
@@ -11,9 +10,6 @@
     <a class="btn btn-primary" asp-action="Create">Add New Expense</a>
 </div>
 
-<div class="alert alert-danger">
-    <strong>Total Expenses:</strong> @totalExpenses.ToString("C")
-</div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body">
@@ -66,30 +62,54 @@
 
 @section Scripts {
     <script>
-        // Function to load filtered data via AJAX
-        function loadFilteredData() {
-               var category = $('#category').val();
-               var description = $('#description').val();   
-               var startDate = $('#startDate').val();
-               var endDate = $('#endDate').val();
+        var currentCategory = $('#category').val();
+        var currentDescription = $('#description').val();
+        var currentStartDate = $('#startDate').val();
+        var currentEndDate = $('#endDate').val();
 
+        // Function to load filtered data via AJAX
+        function loadFilteredData(category, description, startDate, endDate) {;
                $.ajax({
                    url: '@Url.Action("Filter", "Expense")',
                    type: 'GET',
                    data: { category: category, description: description, startDate: startDate, endDate: endDate },
                    success: function (result) {
                        $('#expenseTableContainer').html(result);
+                       // Update current filter values
+                        currentCategory = category;
+                        currentDescription = description;
+                        currentStartDate = startDate;
+                        currentEndDate = endDate;
+                       // Toggle "Filtered" label visibility
+                       if (category || description || startDate || endDate) {
+                           $('#filteredLabel').removeClass('d-none');
+                       } else {
+                           $('#filteredLabel').addClass('d-none');
+                       }
                    },
                    error: function () {
                        alert('Error loading data.');
                    }
                });
+
            }
 
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
-            loadFilteredData();
+            var category = $('#category').val();
+            var description = $('#description').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            // Filters unchanged, no need to reload.
+            if (category === currentCategory &&
+                description === currentDescription &&
+                startDate === currentStartDate &&
+                endDate === currentEndDate) {
+                return;
+            }
+            loadFilteredData(category, description, startDate, endDate);
         });
 
         // Clear filters
@@ -99,7 +119,12 @@
             $('#description').val('');
             $('#startDate').val('');
             $('#endDate').val('');
-            loadFilteredData();
+
+            // No filters to clear.
+            if (!currentCategory && !currentDescription && !currentStartDate && !currentEndDate) {
+                return;
+            }
+            loadFilteredData('', '', '', '');
         });
     </script>
 }

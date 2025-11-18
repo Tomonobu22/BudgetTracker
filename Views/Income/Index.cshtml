@@ -2,17 +2,12 @@
 
 @{
     ViewData["Title"] = "Income Dashboard";
-    var totalIncome = Model.Sum(i => i.Amount);
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <div class="mb-3">
     <a class="btn btn-primary" asp-action="Create">Add New Income</a>
-</div>
-
-<div class="alert alert-success">
-    <strong>Total Income:</strong> @totalIncome.ToString("C")
 </div>
 
 <div class="card shadow-sm mb-4">
@@ -61,18 +56,28 @@
 
 @section Scripts {
     <script>
-        // Function to load filtered data via AJAX
-        function loadFilteredData() {
-               var source = $('#source').val();
-               var startDate = $('#startDate').val();
-               var endDate = $('#endDate').val();
+        var currentSource = $('#source').val();
+        var currentStartDate = $('#startDate').val();
+        var currentEndDate = $('#endDate').val();
 
+        // Function to load filtered data via AJAX
+        function loadFilteredData(source, startDate, endDate) {
                $.ajax({
                    url: '@Url.Action("Filter", "Income")',
                    type: 'GET',
                    data: { source: source, startDate: startDate, endDate: endDate },
                    success: function (result) {
                        $('#incomeTableContainer').html(result);
+                       // Update current filter values
+                        currentSource = source;
+                        currentStartDate = startDate;
+                        currentEndDate = endDate;
+                        // Toggle "Filtered" label visibility
+                        if (source || startDate || endDate) {
+                            $('#filteredLabel').removeClass('d-none');
+                        } else {
+                            $('#filteredLabel').addClass('d-none');
+                        }
                    },
                    error: function () {
                        alert('Error loading data.');
@@ -83,7 +88,13 @@
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
-            loadFilteredData();
+            var source = $('#source').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            if (source === currentSource && startDate === currentStartDate && endDate === currentEndDate) {
+                return; // No changes in filters
+            }
+            loadFilteredData(source, startDate, endDate);
         });
 
         // Clear filters
@@ -92,7 +103,12 @@
             $('#source').val('');
             $('#startDate').val('');
             $('#endDate').val('');
-            loadFilteredData();
+
+            // No filters to clear.
+            if (!currentSource && !currentStartDate && !currentEndDate) {
+                return;
+            }
+            loadFilteredData('', '', '');
         });
     </script>
 }
