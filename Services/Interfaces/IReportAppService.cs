@@ -6,5 +6,6 @@ namespace BudgetTracker.Services.Interfaces
     {
         Task<ReportSummaryViewModel> GetSummaryReportAsync (string userId, DateTime startDate, DateTime endDate);
         Task<MonthlySummaryViewModel> GetMonthlySummaryAsync(string userId, int year);
+        Task<List<int>> GetAvailableYearsAsync(string userId);
     }
 }

@@ -58,5 +58,14 @@ namespace BudgetTracker.Repositories.Implementations
             _dbSet.Remove(expense);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<int>> GetYearsWithDataAsync(string userId)
+        {
+            return await _dbSet
+                .Where(e => e.UserId == userId)
+                .Select(e => e.DateIncurred.Year)
+                .Distinct()
+                .ToListAsync();
+        }
     }
 }

@@ -1,0 +1,44 @@
+﻿/* Center the chart and add styling */
+.chart_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.chart_div {
+    text-align: center;
+}
+
+#yearForm {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Arial, sans-serif;
+}
+
+    #yearForm label {
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+#yearSelect {
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+    #yearSelect:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+        outline: none;
+    }
