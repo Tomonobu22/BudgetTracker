@@ -86,7 +86,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder.WithOrigins("https://localhost:5001", "http://localhost:5000") // specify the allowed origins
+        builder.WithOrigins("https://tomonobu22.github.io/site") // specify the allowed origins
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -108,9 +108,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     // Renders a web UI for exploring the API endpoints
     app.UseSwaggerUI();
-    app.UseCors("AllowAll");
+    //app.UseCors("AllowAll");
 }
 
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseRouting();
