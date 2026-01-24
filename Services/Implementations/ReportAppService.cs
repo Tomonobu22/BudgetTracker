@@ -69,6 +69,12 @@ namespace BudgetTracker.Services.Implementations
                 .Distinct()
                 .OrderByDescending(y => y)
                 .ToList();
+            // Add current year if not present
+            var currentYear = DateTime.Now.Year;
+            if (!allYears.Contains(currentYear))
+            {
+                allYears.Insert(0, currentYear);
+            }
             return allYears;
         }
     }
