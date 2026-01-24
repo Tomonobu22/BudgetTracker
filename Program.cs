@@ -86,7 +86,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder.WithOrigins("https://tomonobu22.github.io/site") // specify the allowed origins
+        builder.WithOrigins("https://tomonobu22.github.io") // specify the allowed origins
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
