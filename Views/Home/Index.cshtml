@@ -9,53 +9,93 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <!-- Year selector -->
-<form method="get" id="yearForm">
-    <label for="yearSelect">Select Year:</label>
-    <select asp-for="Year"
-            asp-items="@(new SelectList(years, Model.Year))"
-            id="yearSelect"
-            onchange="this.form.submit()">
-    </select>
-</form>
+<div class="text-center mb-4">
+    <form method="get" id="yearForm" class="d-inline-block">
+        <select asp-for="Year"
+                asp-items="@(new SelectList(years, Model.Year))"
+                id="yearSelect"
+                class="form-select form-select-lg text-center"
+                style="width: 150px;"
+                onchange="this.form.submit()">
+        </select>
+    </form>
+</div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Income @Model.Year</h5>
-                <p class="card-text">@Model.TotalIncome.ToString("C")</p>
-                <a href="@Url.Action("Index", "Income")" class="btn btn-light btn-sm">View Details</a>
+<div class="container-fluid">
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total Income @Model.Year</h6>
+                    <h3 class="fw-bold">@Model.TotalIncome.ToString("C")</h3>
+                    <a href="@Url.Action("Index", "Income")" class="btn btn-light btn-sm mt-2">View Details</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Total Expenses @Model.Year</h5>
-                <p class="card-text">@Model.TotalExpenses.ToString("C")</p>
-                <a href="@Url.Action("Index", "Expense")" class="btn btn-light btn-sm">View Details</a>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-danger shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Total Expenses @Model.Year</h6>
+                    <h3 class="fw-bold">@Model.TotalExpenses.ToString("C")</h3>
+                    <a href="@Url.Action("Index", "Expense")" class="btn btn-light btn-sm mt-2">View Details</a>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-info mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Investments @Model.Year</h5>
-                <p class="card-text">@Model.TotalInvestments.ToString("C")</p>
-                <a href="@Url.Action("Index", "Investment")" class="btn btn-light btn-sm">View Details</a>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-info shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase">Investments @Model.Year</h6>
+                    <h3 class="fw-bold">@Model.TotalInvestments.ToString("C")</h3>
+                    <a href="@Url.Action("Index", "Investment")" class="btn btn-light btn-sm mt-2">View Details</a>
+                </div>
             </div>
         </div>
+
     </div>
 
-    <div class="chart_container">
-        <div class="chart_div" id="cash_flow_chart_div"></div>
+    <!-- Charts Section -->
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    Cash Flow
+                </div>
+                <div class="card-body chart_container">
+                    <div id="cash_flow_chart_div" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    Income vs Expenses
+                </div>
+                <div class="card-body chart_container">
+                    <div id="diff_chart_div" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">
+                    Investments Overview
+                </div>
+                <div class="card-body chart_container">
+                    <div id="inv_chart_div" style="height:350px;"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="chart_container" style="margin-top: 30px;">
-        <div class="chart_div" id="diff_chart_div"></div>
-    </div>
-    <div class="chart_container" style="margin-top: 30px;">
-        <div class="chart_div" id="inv_chart_div"></div>
-    </div>
+
 </div>
 
 <script src="~/js/charts.js"></script>

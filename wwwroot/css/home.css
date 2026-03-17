@@ -15,30 +15,16 @@
 }
 
 #yearForm {
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: Arial, sans-serif;
+    display: inline-block; /* so form width fits the dropdown only */
 }
-
-    #yearForm label {
-        font-weight: bold;
-        font-size: 14px;
-    }
 
 #yearSelect {
-    padding: 5px 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-    cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 150px; /* fixed compact width */
+    text-align: center; /* center the selected value */
+    font-size: 1.25rem; /* larger font like a title */
+    font-weight: 600; /* semi-bold */
+    border-radius: 0.375rem; /* rounded corners, matches Bootstrap cards */
+    border: 1px solid #ced4da; /* subtle border */
+    background-color: #ffffff; /* white background to match dashboard */
 }
 
-    #yearSelect:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
-        outline: none;
-    }

@@ -30,7 +30,7 @@ namespace BudgetTracker.Controllers
         // GET: Tag
         public async Task<IActionResult> Index()
         {
-            var tags = (await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId)).OrderBy(t => t.Name);
+            var tags = (await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId)).OrderBy(t => t.Context).ThenBy(t => t.Name);
             return View(tags);
         }
 
@@ -40,11 +40,11 @@ namespace BudgetTracker.Controllers
             var tags = await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId);
             if (context != null && context != RecordType.Empty)
             {
-                tags = tags.Where(t => t.Context == context);
+                tags = tags.Where(t => t.Context == context).OrderBy(t => t.Name);
             }
             if (!string.IsNullOrEmpty(tagName))
             {
-                tags = tags.Where(t => t.Name.Contains(tagName, StringComparison.OrdinalIgnoreCase));
+                tags = tags.Where(t => t.Name.Contains(tagName, StringComparison.OrdinalIgnoreCase)).OrderBy(t => t.Name);
             }
             return PartialView("_TagTablePartial", tags);
         }
