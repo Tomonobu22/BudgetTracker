@@ -2,41 +2,108 @@
 
 @{
     ViewData["Title"] = "Income Dashboard";
-    var totalIncome = Model.Sum(i => i.Amount);
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div class="mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">@ViewData["Title"]</h1>
     <a class="btn btn-primary" asp-action="Create">Add New Income</a>
 </div>
 
-<div class="alert alert-success">
-    <strong>Total Income:</strong> @totalIncome.ToString("C")
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Income Source</label>
+                <select id="source" class="form-select">
+                    <option value="">All Sources</option>
+                    @foreach (var s in ViewBag.Sources)
+                    {
+                        <option value="@s">@s</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">From Date</label>
+                <input type="date" id="startDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">To Date</label>
+                <input type="date" id="endDate" class="form-control" />
+            </div>
+
+            <div class="col-md-3 d-flex justify-content-end">
+                <button id="filterBtn" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+                <button id="clearBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Source</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Source</td>
-                <td>@item.Amount.ToString("C")</td>
-                <td>@item.DateReceived.ToShortDateString()</td>
-                <td>
-                    <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="incomeTableContainer">
+    <partial name="_IncomeTablePartial" model="Model" />
+</div>
+
+@section Scripts {
+    <script>
+        var currentSource = $('#source').val();
+        var currentStartDate = $('#startDate').val();
+        var currentEndDate = $('#endDate').val();
+
+        // Function to load filtered data via AJAX
+        function loadFilteredData(source, startDate, endDate) {
+               $.ajax({
+                   url: '@Url.Action("Filter", "Income")',
+                   type: 'GET',
+                   data: { source: source, startDate: startDate, endDate: endDate },
+                   success: function (result) {
+                       $('#incomeTableContainer').html(result);
+                       // Update current filter values
+                        currentSource = source;
+                        currentStartDate = startDate;
+                        currentEndDate = endDate;
+                        // Toggle "Filtered" label visibility
+                        if (source || startDate || endDate) {
+                            $('#filteredLabel').removeClass('d-none');
+                        } else {
+                            $('#filteredLabel').addClass('d-none');
+                        }
+                   },
+                   error: function () {
+                       alert('Error loading data.');
+                   }
+               });
+           }
+
+        // Trigger filter
+        $('#filterBtn').on('click', function (e) {
+            e.preventDefault();
+            var source = $('#source').val();
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+            if (source === currentSource && startDate === currentStartDate && endDate === currentEndDate) {
+                return; // No changes in filters
+            }
+            loadFilteredData(source, startDate, endDate);
+        });
+
+        // Clear filters
+        $('#clearBtn').on('click', function (e) {
+            e.preventDefault();
+            $('#source').val('');
+            $('#startDate').val('');
+            $('#endDate').val('');
+
+            // No filters to clear.
+            if (!currentSource && !currentStartDate && !currentEndDate) {
+                return;
+            }
+            loadFilteredData('', '', '');
+        });
+    </script>
+}

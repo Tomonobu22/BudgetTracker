@@ -12,9 +12,9 @@
         <p class="fw-bold">Are you sure you want to delete this income record?</p>
 
         <div class="mb-3 row align-items-center">
-            <label class="col-sm-3 col-form-label text-end pe-3"><strong> @Html.DisplayNameFor(model => model.Source):</strong></label>
+            <label class="col-sm-3 col-form-label text-end pe-3"><strong> @Html.DisplayNameFor(model => model.Tag.Name):</strong></label>
             <div class="col-sm-9 text-danger">
-                @Model.Source
+                @Model.Tag?.Name
             </div>
         </div>
         <div class="mb-3 row align-items-center">

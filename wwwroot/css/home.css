@@ -1,0 +1,30 @@
+﻿/* Center the chart and add styling */
+.chart_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.chart_div {
+    text-align: center;
+}
+
+#yearForm {
+    display: inline-block; /* so form width fits the dropdown only */
+}
+
+#yearSelect {
+    width: 150px; /* fixed compact width */
+    text-align: center; /* center the selected value */
+    font-size: 1.25rem; /* larger font like a title */
+    font-weight: 600; /* semi-bold */
+    border-radius: 0.375rem; /* rounded corners, matches Bootstrap cards */
+    border: 1px solid #ced4da; /* subtle border */
+    background-color: #ffffff; /* white background to match dashboard */
+}
+

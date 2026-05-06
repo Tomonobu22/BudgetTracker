@@ -15,5 +15,17 @@ namespace BudgetTracker.Data
         public DbSet<Income> Incomes { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Investment> Investments { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Configure relationships and constraints if needed
+            builder.Entity<Tag>()
+                .Property(t => t.Context)
+                .HasConversion<string>();
+        }
     }
 }

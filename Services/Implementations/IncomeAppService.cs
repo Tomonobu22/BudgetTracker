@@ -23,6 +23,12 @@ namespace BudgetTracker.Services.Implementations
             return _mapper.Map<IEnumerable<IncomeDto>>(income);
         }
 
+        public async Task<bool> HasIncomesWithTagAsync(int tagId)
+        {
+            var allIncomes = await _incomeRepository.GetAllAsync();
+            return allIncomes.Any(i => i.TagId == tagId);
+        }
+
         public async Task CreateAsync(IncomeDto dto, string userId)
         {
             var income = _mapper.Map<Income>(dto);

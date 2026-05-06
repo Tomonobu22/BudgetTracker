@@ -1,0 +1,62 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div class="modal fade" id="addTypeModal" tabindex="-1" aria-labelledby="addTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTypeModalLabel">Add New</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="newTypeName" class="form-control" placeholder="Type name" required />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="addTypeBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+         const btn = document.getElementById('addTypeBtn');
+         const input = document.getElementById('newTypeName');
+         const hiddenInput = document.getElementById('newTagName');
+
+         btn.addEventListener('click', function (e) {
+             const value = input.value.trim();
+             if (!value) return;
+
+             // Find the select dropdown (you could pass its id via data attribute)
+             const select = document.getElementById('TagId');
+             if (!select) return;
+
+
+             var existingOption = [...select.options].find(o => o.text.toLowerCase() === value.toLowerCase());
+
+             // Check if value already exists, case insensitive
+             var maxInt = 2147483647;
+             if (!existingOption) {
+                 const option = new Option(value, maxInt, true, true);
+                 select.add(option);
+                 select.value = maxInt; // select it
+                 // Add the value to the hidden input newTagName
+                if (hiddenInput) {
+                    hiddenInput.value = value;
+                }
+             }
+             else {
+                 // Just select existing option
+                 select.value = existingOption.value;
+             }
+
+             // Clear and hide modal
+            input.value = '';
+            const modalEl = document.getElementById('addTypeModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+         });
+    });
+</script>

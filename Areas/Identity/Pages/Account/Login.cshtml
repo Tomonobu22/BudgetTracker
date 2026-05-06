@@ -6,45 +6,94 @@
 }
 
 <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <section>
-            <form id="account" method="post">
-                <p>Please use the following credentials: [email: admin@budget.com, password: Budget123!]</p>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-@*                     <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p> *@
-                </div>
-            </form>
-        </section>
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <form id="account" method="post" novalidate>
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger"
+                         role="alert">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email"
+                               value="admin@budget.com"
+                               class="form-control"
+                               autocomplete="username"
+                               placeholder="name@example.com"
+                               aria-required="true" />
+                        <label asp-for="Input.Email">Email address</label>
+                        <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-floating mb-3 position-relative">
+                        <input asp-for="Input.Password"
+                               type="password"
+                               class="form-control"
+                               id="passwordField"
+                               value="Budget123!"
+                               autocomplete="current-password"
+                               placeholder="Password"
+                               aria-required="true" />
+
+                        <label asp-for="Input.Password">Password</label>
+
+                        <!-- Toggle button -->
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary position-absolute top-50 end-0 translate-middle-y me-2"
+                                onclick="togglePassword(this)"
+                                tabindex="-1">
+                            Show
+                        </button>
+
+                        <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Remember me + Forgot -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   asp-for="Input.RememberMe" />
+                            <label class="form-check-label"
+                                   asp-for="Input.RememberMe">
+                                Remember me
+                            </label>
+                        </div>
+
+                        <a id="forgot-password"
+                           asp-page="./ForgotPassword"
+                           class="small">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="d-grid mb-3">
+                        <button id="login-submit"
+                                type="submit"
+                                class="btn btn-primary btn-lg">
+                            Log in
+                        </button>
+                    </div>
+
+                    <!-- Register -->
+                    <div class="text-center">
+                        <span class="text-muted small">Don't have an account?</span><br />
+                        <a asp-page="./Register"
+                           asp-route-returnUrl="@Model.ReturnUrl">
+                            Create one
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
 @*     <div class="col-md-6 col-md-offset-2">
         <section>
@@ -77,6 +126,19 @@
         </section>
     </div> *@
 </div>
+
+<script>
+    function togglePassword(button) {
+        const field = document.getElementById("passwordField");
+        if (field.type === "password") {
+            field.type = "text";
+            button.innerText = "Hide";
+        } else {
+            field.type = "password";
+            button.innerText = "Show";
+        }
+    }
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
