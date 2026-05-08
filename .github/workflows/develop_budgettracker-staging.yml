@@ -30,7 +30,18 @@ jobs:
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Install ABP libs
-        run: abp install-libs
+        run: abp install-libs -p BudgetTracker.csproj
+
+      - name: Show Identity lib folder
+        shell: powershell
+        run: |
+          $identityLib = "./BudgetTracker/wwwroot/Identity/lib"
+          if (Test-Path $identityLib) {
+              Write-Host "Identity/lib exists:"
+              Get-ChildItem -Recurse $identityLib
+          } else {
+              Write-Host "Identity/lib does NOT exist!"
+          }
         
       - name: Build with dotnet
         run: dotnet build BudgetTracker.csproj --configuration Release
@@ -38,16 +49,28 @@ jobs:
       - name: dotnet publish
         run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
 
-      - name: Copy global libs to publish/wwwroot/lib
+      - name: Show publish folder
+        shell: powershell
         run: |
-          $IDENTITY_LIB_DIR = "./BudgetTracker/wwwroot/Identity/lib"
-          $PUBLISH_LIB_DIR  = "./publish/wwwroot/lib"
-          if (Test-Path $IDENTITY_LIB_DIR) {
-            New-Item -ItemType Directory -Force $PUBLISH_LIB_DIR
-            Copy-Item -Recurse "$IDENTITY_LIB_DIR\*" $PUBLISH_LIB_DIR
-            Write-Host "Copied Identity libs to global lib"
+          $publishDir = "./publish/wwwroot"
+          if (Test-Path $publishDir) {
+              Write-Host "Publish wwwroot content:"
+              Get-ChildItem -Recurse $publishDir
           } else {
-              Write-Host "No Identity libs found, skipping copy"
+              Write-Host "Publish folder does NOT exist!"
+          }
+      
+      - name: Copy global libs to publish/wwwroot/lib
+        shell: powershell
+        run: |
+          $identityLib = "./publish/wwwroot/Identity/lib"
+          $globalLib = "./publish/wwwroot/lib"
+          if (Test-Path $identityLib) {
+              New-Item -ItemType Directory -Force $globalLib
+              Copy-Item -Recurse "$identityLib\*" $globalLib
+              Write-Host "Copied Identity libs to global lib"
+          } else {
+              Write-Host "No Identity libs found in publish, skipping copy"
           }
 
       - name: Upload artifact for deployment job
