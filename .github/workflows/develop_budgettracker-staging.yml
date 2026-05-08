@@ -33,7 +33,7 @@ jobs:
         run: abp install-libs
         
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build BudgetTracker.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
