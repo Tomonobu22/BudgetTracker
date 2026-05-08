@@ -30,7 +30,7 @@ jobs:
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Install ABP libs
-        run: abp install-libs
+        run: abp install-libs -p BudgetTracker.csproj
 
       - name: Copy global libs to root
         run: |
