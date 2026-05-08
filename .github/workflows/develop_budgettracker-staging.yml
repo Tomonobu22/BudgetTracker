@@ -25,8 +25,14 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
+        
+      - name: Install ABP CLI
+        run: dotnet tool install -g Volo.Abp.Cli
 
-      - name: Instal ABP libs
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      
+      - name: Install ABP libs
         run: abp install-libs
 
       - name: dotnet publish
