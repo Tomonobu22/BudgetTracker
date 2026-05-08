@@ -9,8 +9,7 @@
 
         public List<string> MonthNames { get; set; } = new()
         {
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         };
 
         public decimal TotalIncome => MonthlyIncome.Sum();

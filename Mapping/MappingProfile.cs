@@ -11,6 +11,7 @@ namespace BudgetTracker.Mapping
             CreateMap<Income, IncomeDto>().ReverseMap();
             CreateMap<Expense, ExpenseDto>().ReverseMap();
             CreateMap<Investment, InvestmentDto>().ReverseMap();
+            CreateMap<Tag, TagDto>().ReverseMap();
         }
     }
 }

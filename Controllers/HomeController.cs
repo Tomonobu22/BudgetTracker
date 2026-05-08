@@ -20,9 +20,10 @@ namespace BudgetTracker.Controllers
         }
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? year)
         {
-            var model = await _reportAppService.GetMonthlySummaryAsync(CurrentUserId, DateTime.Now.Year);
+            var model = await _reportAppService.GetMonthlySummaryAsync(CurrentUserId, year ?? DateTime.Now.Year);
+            ViewBag.AvailableYears = await _reportAppService.GetAvailableYearsAsync(CurrentUserId);
             return View(model);
         }
 

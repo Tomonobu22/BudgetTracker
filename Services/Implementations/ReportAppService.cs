@@ -57,5 +57,25 @@ namespace BudgetTracker.Services.Implementations
                 MonthlyInvestments = monthlyInvestment
             };
         }
+
+        public async Task<List<int>> GetAvailableYearsAsync(string userId)
+        {
+            var incomeYears = await _incomeRepository.GetYearsWithDataAsync(userId);
+            var expenseYears = await _expenseRepository.GetYearsWithDataAsync(userId);
+            var investmentYears = await _investmentRepository.GetYearsWithDataAsync(userId);
+            var allYears = incomeYears
+                .Union(expenseYears)
+                .Union(investmentYears)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+            // Add current year if not present
+            var currentYear = DateTime.Now.Year;
+            if (!allYears.Contains(currentYear))
+            {
+                allYears.Insert(0, currentYear);
+            }
+            return allYears;
+        }
     }
 }

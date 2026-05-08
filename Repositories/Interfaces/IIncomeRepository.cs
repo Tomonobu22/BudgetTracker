@@ -7,5 +7,6 @@ namespace BudgetTracker.Repositories.Interfaces
         Task<IEnumerable<Income>> GetAllByUserAsync(string userId);
         Task<decimal> GetTotalIncomeAsync(string userId, DateTime startDate, DateTime endDate);
         Task<List<decimal>> GetMonthlyIncomeAsync(string userId, int year);
+        Task<List<int>> GetYearsWithDataAsync(string userId);
     }
 }

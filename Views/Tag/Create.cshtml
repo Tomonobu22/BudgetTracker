@@ -1,0 +1,38 @@
+﻿@model BudgetTracker.DTOs.TagDto
+
+@{
+    ViewData["Title"] = "Add Tag";
+}
+
+<div class="card border-success">
+    <div class="card-header bg-success text-white">
+        Add New Tag
+    </div>
+    <div class="card-body">
+        <form asp-action="create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label text-end pe-3"><strong>Name:</strong></label>
+                <div class="col-sm-9">
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label text-end pe-3"><strong>Context:</strong></label>
+                <div class="col-sm-9">
+                    <select asp-for="Context" class="form-control" asp-items="ViewBag.Contexts"></select>
+                    <span asp-validation-for="Context" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-success me-2">Add</button>
+                <a asp-action="Index" class="btn btn-secondary me-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

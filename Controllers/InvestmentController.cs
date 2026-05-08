@@ -1,7 +1,9 @@
 ﻿using BudgetTracker.DTOs;
+using BudgetTracker.Enums;
 using BudgetTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -11,10 +13,12 @@ namespace BudgetTracker.Controllers
     public class InvestmentController : Controller
     {
         private readonly IInvestmentAppService _investmentAppService;
+        private readonly ITagAppService _tagAppService;
 
-        public InvestmentController(IInvestmentAppService investmentAppService)
+        public InvestmentController(IInvestmentAppService investmentAppService, ITagAppService tagAppService)
         {
             _investmentAppService = investmentAppService;
+            _tagAppService = tagAppService;
         }
 
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -23,8 +27,30 @@ namespace BudgetTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
+            var types = investments.Select(i => i.Tag?.Name).Distinct().ToList();
+            ViewBag.Types = types;
             return View(investments);
         }
+
+        // GET: Filtered Investment
+        public async Task<IActionResult> Filter(string? type, DateTime? startDate, DateTime? endDate)
+        {
+            var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
+            if (!string.IsNullOrEmpty(type))
+            {
+                investments = investments.Where(i => i.Tag != null && i.Tag.Name.ToLower() == type.ToLower());
+            }
+            if (startDate.HasValue)
+            {
+                investments = investments.Where(i => i.DateInvested >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                investments = investments.Where(i => i.DateInvested <= endDate.Value);
+            }
+            return PartialView("_InvestmentTablePartial", investments);
+        }
+
 
         // GET: Investment/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -46,6 +72,8 @@ namespace BudgetTracker.Controllers
         // GET: Investment/Create
         public IActionResult Create()
         {
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View();
         }
 
@@ -54,8 +82,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = RecordType.Investment
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                investment.TagId = newId;
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(investment);
@@ -77,6 +116,8 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
             return View(investment);
         }
 
@@ -85,8 +126,19 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Amount,DateInvested,CurrentValue")] InvestmentDto investment)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
         {
+            if (!string.IsNullOrEmpty(newTagName))
+            {
+                var newTag = new TagDto
+                {
+                    Name = newTagName,
+                    Context = RecordType.Investment
+                };
+                var newId = await _tagAppService.CreateAsync(newTag, CurrentUserId);
+                investment.TagId = newId;
+            }
+
             if (id != investment.Id)
             {
                 return NotFound();

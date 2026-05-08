@@ -13,6 +13,7 @@ namespace BudgetTracker.Repositories.Implementations
         {
             return await _dbSet
                 .Where(e => e.UserId == userId)
+                .Include(e => e.Tag)
                 .OrderByDescending(e => e.DateIncurred)
                 .ToListAsync();
         }
@@ -36,6 +37,12 @@ namespace BudgetTracker.Repositories.Implementations
             return monthlyExpense;
         }
 
+        public override async Task<Expense?> GetByIdAsync(int id)
+        {
+            return await _dbSet
+                .Include(e => e.Tag)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
         public override async Task AddAsync(Expense expense)
         {
             _dbSet.Add(expense);
@@ -50,6 +57,15 @@ namespace BudgetTracker.Repositories.Implementations
         {
             _dbSet.Remove(expense);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<int>> GetYearsWithDataAsync(string userId)
+        {
+            return await _dbSet
+                .Where(e => e.UserId == userId)
+                .Select(e => e.DateIncurred.Year)
+                .Distinct()
+                .ToListAsync();
         }
     }
 }

@@ -17,10 +17,6 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
-
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -28,4 +24,100 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* Background */
+body {
+    margin-bottom: 60px;
+    background: linear-gradient(135deg, #f5f7fa, #e4e8ef);
+    min-height: 100vh;
+}
+
+/* Card styling */
+.card {
+    border-radius: 12px;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.shadow-sm {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Inputs */
+.form-control:focus {
+    border-color: #4f8cff;
+    box-shadow: 0 0 0 0.2rem rgba(79, 140, 255, 0.25);
+}
+
+/* Floating labels */
+.form-floating > label {
+    opacity: 0.75;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: 1;
+}
+
+/* Button */
+.btn-primary {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Password toggle button */
+#togglePasswordBtn {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* Links */
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Error text */
+.text-danger.small {
+    font-size: 0.8rem;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1f2937; /* dark slate */
+}
+
+.navbar .nav-link,
+.navbar-brand {
+    color: #f9fafb !important;
+}
+
+.navbar .nav-link:hover {
+    color: #93c5fd !important;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
