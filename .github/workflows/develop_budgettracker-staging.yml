@@ -40,16 +40,15 @@ jobs:
 
       - name: Copy global libs to publish/wwwroot/lib
         run: |
-          PUBLISH_LIB_DIR=./publish/wwwroot/lib
-          IDENTITY_LIB_DIR=./publish/wwwroot/Identity/lib
-          
-          if [ -d "$IDENTITY_LIB_DIR" ]; then
-            mkdir -p "$PUBLISH_LIB_DIR"
-            cp -r "$IDENTITY_LIB_DIR/"* "$PUBLISH_LIB_DIR/"
-            echo "Copied Identity libs to global lib"
-          else
-            echo "No Identity libs found, skipping copy"
-          fi
+          $IDENTITY_LIB_DIR = "./BudgetTracker/wwwroot/Identity/lib"
+          $PUBLISH_LIB_DIR  = "./publish/wwwroot/lib"
+          if (Test-Path $IDENTITY_LIB_DIR) {
+            New-Item -ItemType Directory -Force $PUBLISH_LIB_DIR
+            Copy-Item -Recurse "$IDENTITY_LIB_DIR\*" $PUBLISH_LIB_DIR
+            Write-Host "Copied Identity libs to global lib"
+          } else {
+              Write-Host "No Identity libs found, skipping copy"
+          }
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
