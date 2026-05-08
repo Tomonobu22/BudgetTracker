@@ -28,18 +28,20 @@ jobs:
 
       - name: Add .NET tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-      
+
       - name: Install ABP libs
         run: abp install-libs
+
+      - name: Copy global libs to root
+        run: |
+          mkdir -p ./wwwroot/lib
+          cp -r ./wwwroot/Identity/lib/* ./wwwroot/lib/ || echo "No Identity libs found"
         
       - name: Build with dotnet
         run: dotnet build BudgetTracker.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
-        
-      - name: Check publish structure
-        run: ls -R ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
