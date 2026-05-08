@@ -23,17 +23,39 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      - name: Install ABP CLI
+        run: dotnet tool install -g Volo.Abp.Cli
+
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Install ABP libs
+        run: abp install-libs -p BudgetTracker.csproj
+
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build BudgetTracker.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+        run: dotnet publish BudgetTracker.csproj -c Release -o ./publish/wwwroot
+      
+      - name: Copy global libs to publish/wwwroot/lib
+        shell: powershell
+        run: |
+          $identityLib = "./publish/wwwroot/Identity/lib"
+          $globalLib = "./publish/wwwroot/lib"
+          if (Test-Path $identityLib) {
+              New-Item -ItemType Directory -Force $globalLib
+              Copy-Item -Recurse "$identityLib\*" $globalLib
+              Write-Host "Copied Identity libs to global lib"
+          } else {
+              Write-Host "No Identity libs found in publish, skipping copy"
+          }
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish/wwwroot
 
   deploy:
     runs-on: windows-latest
