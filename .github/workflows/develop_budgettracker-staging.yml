@@ -32,33 +32,11 @@ jobs:
       - name: Install ABP libs
         run: abp install-libs -p BudgetTracker.csproj
 
-      - name: Show Identity lib folder
-        shell: powershell
-        run: |
-          $identityLib = "./BudgetTracker/wwwroot/Identity/lib"
-          if (Test-Path $identityLib) {
-              Write-Host "Identity/lib exists:"
-              Get-ChildItem -Recurse $identityLib
-          } else {
-              Write-Host "Identity/lib does NOT exist!"
-          }
-        
       - name: Build with dotnet
         run: dotnet build BudgetTracker.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
-
-      - name: Show publish folder
-        shell: powershell
-        run: |
-          $publishDir = "./publish/wwwroot"
-          if (Test-Path $publishDir) {
-              Write-Host "Publish wwwroot content:"
-              Get-ChildItem -Recurse $publishDir
-          } else {
-              Write-Host "Publish folder does NOT exist!"
-          }
+        run: dotnet publish BudgetTracker.csproj -c Release -o ./publish/wwwroot
       
       - name: Copy global libs to publish/wwwroot/lib
         shell: powershell
@@ -77,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: ./publish/wwwroot
 
   deploy:
     runs-on: windows-latest
