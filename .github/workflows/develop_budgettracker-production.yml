@@ -33,21 +33,16 @@ jobs:
         run: abp install-libs
         
       - name: Build with dotnet
-        run: dotnet build BudgetTracker.csproj --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BudgetTracker.csproj -c Release -o publish
-
-      - name: Zip package
-        run: |
-          cd publish
-          zip -r ../app.zip
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: app.zip
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -68,5 +63,5 @@ jobs:
         with:
           app-name: 'BudgetTracker'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISH_PROFILE_PROD }}
-          package: app.zip
+          package: .
           
