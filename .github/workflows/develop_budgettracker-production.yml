@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+build:
+    runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -23,24 +23,75 @@ jobs:
         with:
           dotnet-version: '9.x'
 
-      - name: Restore
-        run: dotnet restore
+      - name: Install ABP CLI
+        run: dotnet tool install -g Volo.Abp.Cli
 
-      - name: Build project
-        run: dotnet build -c Release --no-restore
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Install ABP libs
+        run: abp install-libs
+
+      - name: Show Identity lib folder
+        shell: powershell
+        run: |
+          $identityLib = "./BudgetTracker/wwwroot/Identity/lib"
+          if (Test-Path $identityLib) {
+              Write-Host "Identity/lib exists:"
+              Get-ChildItem -Recurse $identityLib
+          } else {
+              Write-Host "Identity/lib does NOT exist!"
+          }
         
-      - name: Publish dotnet
-        run: dotnet publish BudgetTracker.csproj -c Release -o publish
+      - name: Build with dotnet
+        run: dotnet build BudgetTracker.csproj --configuration Release
 
-      - name: Verify (DEBUG)
-        run: ls -R publish
-          
+      - name: dotnet publish
+        run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
+
+      - name: Copy global libs to publish/wwwroot/lib
+        run: |
+          $IDENTITY_LIB_DIR = "./BudgetTracker/wwwroot/Identity/lib"
+          $PUBLISH_LIB_DIR  = "./publish/wwwroot/lib"
+          if (Test-Path $IDENTITY_LIB_DIR) {
+            New-Item -ItemType Directory -Force $PUBLISH_LIB_DIR
+            Copy-Item -Recurse "$IDENTITY_LIB_DIR\*" $PUBLISH_LIB_DIR
+            Write-Host "Copied Identity libs to global lib"
+          } else {
+              Write-Host "No Identity libs found, skipping copy"
+          }
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ./publish
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E1727EB823B2415698495CD848B7D054 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D6A67E5F04F94E4FB0E68DFD05C4D5E0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8019B4FCA758491DA6C7F16CC9663CF7 }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'BudgetTracker'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISH_PROFILE_PROD }}
           slot-name: 'Production'
           package: .
           
