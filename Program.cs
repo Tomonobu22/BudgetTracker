@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,24 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 // Register AutoMapper
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);
+
+// Define rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("ApiReportPolicy", context =>
+    {
+        var userId = context.User.FindFirst("sub")?.Value
+                     ?? context.User.Identity?.Name
+                     ?? "anonymous";
+        return RateLimitPartition.GetFixedWindowLimiter(partitionKey: userId, factory: _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10, // Max 10 requests
+            Window = TimeSpan.FromMinutes(1), // Per minute
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0 // No queuing, reject immediately when limit is reached
+        });
+    });
+});
 
 // Build authentication
 builder.Services.AddAuthentication()
@@ -119,6 +138,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseRateLimiter();
 app.MapStaticAssets();
 
 app.MapRazorPages(); // important for Identity pages
