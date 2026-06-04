@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace BudgetTracker.Controllers.Api
@@ -22,6 +23,7 @@ namespace BudgetTracker.Controllers.Api
             _reportAppService = reportAppService;
         }
 
+        [EnableRateLimiting("ApiReportPolicy")]
         [HttpGet("GetReport")]
         public async Task<MonthlySummaryViewModel> GetReport()
         {
