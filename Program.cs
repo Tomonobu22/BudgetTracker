@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.RateLimiting;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,11 +21,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Dependency Injection for Repositories and Services
+// Whenever a class ask for IGenericRepository<T>, it will get an instance of GenericRepository<T>
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IInvestmentRepository, InvestmentRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IImportRepository, ImportRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthenticationAppService, AuthenticationAppService>();
 builder.Services.AddScoped<IIncomeAppService, IncomeAppService>();
@@ -32,7 +35,8 @@ builder.Services.AddScoped<IExpenseAppService, ExpenseAppService>();
 builder.Services.AddScoped<IInvestmentAppService, InvestmentAppService>();
 builder.Services.AddScoped<IReportAppService, ReportAppService>();
 builder.Services.AddScoped<ITagAppService, TagAppService>();
-
+builder.Services.AddScoped<IImportAppService, ImportAppService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 // Token Validation Parameters
 var tokenValidationParameters = new TokenValidationParameters
@@ -47,7 +51,15 @@ var tokenValidationParameters = new TokenValidationParameters
     ClockSkew = TimeSpan.Zero // Optional: eliminate clock skew
 };
 
+// Register the token validation parameters as a singleton so it can be injected wherever needed
 builder.Services.AddSingleton(tokenValidationParameters);
+
+var storageConnectionString = builder.Configuration["AzureStorage:ConnectionString"];
+if (string.IsNullOrEmpty(storageConnectionString))
+{
+    throw new InvalidOperationException("Azure Storage connection string is not configured.");
+}
+builder.Services.AddSingleton(new BlobServiceClient(storageConnectionString));
 
 // Add Identity services 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<AppDbContext>();
@@ -112,6 +124,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Apply pending EF Core migrations and create the database if it doesn't exist
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

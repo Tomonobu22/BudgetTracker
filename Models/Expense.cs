@@ -11,6 +11,6 @@ namespace BudgetTracker.Models
         public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime DateIncurred { get; set; }
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

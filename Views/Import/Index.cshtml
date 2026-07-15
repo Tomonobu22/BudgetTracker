@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Imports";
+}
+
+<div>
+    <h1>Imports</h1>
+    <p>This is the Imports page. Here you can manage your financial data imports. Currently, only csv files are accepted.</p>
+</div>
+
+@if(ViewBag.Message != null)
+{
+    <div class="alert alert-success">
+        @ViewBag.Message
+    </div>
+}
+@if(!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        Please upload a valid CSV file.
+    </div>
+}
+
+@* Form to upload import files *@
+<form asp-action="ImportCsv" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="file" class="form-label">Select csv file to import:</label>
+        <input type="file" class="form-control" id="file" name="file" accept=".csv" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>

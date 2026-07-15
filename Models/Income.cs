@@ -10,6 +10,6 @@ namespace BudgetTracker.Models
         public Tag? Tag { get; set; }
         public decimal Amount { get; set; }
         public DateTime DateReceived { get; set; }
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

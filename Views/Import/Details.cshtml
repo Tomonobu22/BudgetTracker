@@ -1,0 +1,13 @@
+﻿@model BudgetTracker.DTOs.ImportDto
+
+@{
+    ViewData["Title"] = "Import Details";
+}
+
+<h2>Import Details</h2>
+<div>
+    <p><strong>File ID:</strong> @Model.Id</p>
+    <p><strong>File Name:</strong> @Model.FileName</p>
+    <p><strong>Uploaded At:</strong> @Model.UploadedAt</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+</div>
