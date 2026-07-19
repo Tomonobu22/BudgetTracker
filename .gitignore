@@ -1,6 +1,6 @@
 # Build folders
-bin/
-obj/
+**/bin/
+**/obj/
 
 # User-specific files
 *.user
@@ -18,7 +18,7 @@ obj/
 # NuGet packages
 *.nupkg
 *.snupkg
-packages/
+**/packages/
 .nuget/
 
 # Local DB
@@ -28,13 +28,13 @@ packages/
 *.db
 
 # Publish output
-Properties/PublishProfiles/*.pubxml
-Properties/PublishProfiles/*.pubxml.user
-Properties/PublishProfiles/profile.json
-publish/
-wwwroot/lib/
+**/Properties/PublishProfiles/*.pubxml
+**/Properties/PublishProfiles/*.pubxml.user
+**/Properties/PublishProfiles/profile.json
+**/publish/
+**/wwwroot/lib/
 
-Properties/ServiceDependencies
+**/Properties/ServiceDependencies
 
 # Resharper / Rider Files
 _ReSharper*/
@@ -48,4 +48,7 @@ docker-compose.override.yml
 *.env
 
 # ASP.NET Core runtime files
-appsettings.*.json
+**/appsettings.*.json
+
+# Azure Functions local settings
+**/local.settings.json
