@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.RateLimiting;
 using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IReportAppService, ReportAppService>();
 builder.Services.AddScoped<ITagAppService, TagAppService>();
 builder.Services.AddScoped<IImportAppService, ImportAppService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IImportQueueService, ImportQueueService>();
 
 // Token Validation Parameters
 var tokenValidationParameters = new TokenValidationParameters
@@ -60,6 +62,7 @@ if (string.IsNullOrEmpty(storageConnectionString))
     throw new InvalidOperationException("Azure Storage connection string is not configured.");
 }
 builder.Services.AddSingleton(new BlobServiceClient(storageConnectionString));
+builder.Services.AddSingleton(new QueueServiceClient(storageConnectionString));
 
 // Add Identity services 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<AppDbContext>();

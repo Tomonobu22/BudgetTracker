@@ -11,15 +11,18 @@ namespace BudgetTracker.Services.Implementations
     {
         private readonly IImportRepository _importRepository;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IImportQueueService _importQueueService;
         private readonly IMapper _mapper;
         private const int DailyUploadLimit = 5; // Example limit, can be configured
 
         public ImportAppService(IImportRepository importRepository, 
             IBlobStorageService blobStorageService, 
+            IImportQueueService importQueueService,
             IMapper mapper) 
         {
             _importRepository = importRepository;
             _blobStorageService = blobStorageService;
+            _importQueueService = importQueueService;
             _mapper = mapper;
         }
 
@@ -47,6 +50,8 @@ namespace BudgetTracker.Services.Implementations
             try {
                 await using var stream = file.OpenReadStream();
                 await _blobStorageService.UploadAsync(stream, import.BlobName, file.ContentType, cancellationToken);
+                // Enqueue import for processing
+                await _importQueueService.EnqueueImportAsync(import.Id);
             }
             catch (Exception ex)
             {
