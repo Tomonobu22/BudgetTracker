@@ -35,7 +35,7 @@ jobs:
       - name: Show Identity lib folder
         shell: powershell
         run: |
-          $identityLib = "./BudgetTracker.Web/BudgetTracker/wwwroot/Identity/lib"
+          $identityLib = "./BudgetTracker/BudgetTracker.Web/wwwroot/Identity/lib"
           if (Test-Path $identityLib) {
               Write-Host "Identity/lib exists:"
               Get-ChildItem -Recurse $identityLib
@@ -44,14 +44,14 @@ jobs:
           }
         
       - name: Build with dotnet
-        run: dotnet build BudgetTracker.Web/BudgetTracker.csproj --configuration Release
+        run: dotnet build BudgetTracker.Web/BudgetTracker.Web.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BudgetTracker.Web/BudgetTracker.csproj -c Release -o ./publish
+        run: dotnet publish BudgetTracker.Web/BudgetTracker.Web.csproj -c Release -o ./publish
 
       - name: Copy global libs to publish/wwwroot/lib
         run: |
-          $IDENTITY_LIB_DIR = "./BudgetTracker.Web/BudgetTracker/wwwroot/Identity/lib"
+          $IDENTITY_LIB_DIR = "./BudgetTracker/BudgetTracker.Web/wwwroot/Identity/lib"
           $PUBLISH_LIB_DIR  = "./publish/wwwroot/lib"
           if (Test-Path $IDENTITY_LIB_DIR) {
             New-Item -ItemType Directory -Force $PUBLISH_LIB_DIR
