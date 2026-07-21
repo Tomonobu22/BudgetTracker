@@ -1,0 +1,81 @@
+﻿using BudgetTracker.Core.Models;
+using BudgetTracker.Core.Repositories.Interfaces;
+using BudgetTracker.Core.Services.Interfaces;
+
+namespace BudgetTracker.Core.Services.Implementations
+{
+    public class ReportAppService : IReportAppService
+    {
+        private readonly IIncomeRepository _incomeRepository;
+        private readonly IExpenseRepository _expenseRepository;
+        private readonly IInvestmentRepository _investmentRepository;
+
+        public ReportAppService(
+            IIncomeRepository incomeRepository,
+            IExpenseRepository expenseRepository,
+            IInvestmentRepository investmentRepository)
+        {
+            _incomeRepository = incomeRepository;
+            _expenseRepository = expenseRepository;
+            _investmentRepository = investmentRepository;
+        }
+
+
+        public async Task<ReportSummaryViewModel> GetSummaryReportAsync(string userId, DateTime startDate, DateTime endDate)
+        {
+            if (startDate > endDate)
+                throw new ArgumentException("Start date cannot be after end date.");
+
+            var totalIncome = await _incomeRepository.GetTotalIncomeAsync(userId, startDate, endDate);
+            var totalExpenses = await _expenseRepository.GetTotalExpenseAsync(userId, startDate, endDate);
+            var totalInvestments = await _investmentRepository.GetTotalInvestmentAsync(userId, startDate, endDate);
+
+            return new ReportSummaryViewModel
+            {
+                TotalIncome = totalIncome,
+                TotalExpenses = totalExpenses,
+                TotalInvestments = totalInvestments,
+                Year = startDate.Year
+            };
+        }
+
+        public async Task<MonthlySummaryViewModel> GetMonthlySummaryAsync(string userId, int year)
+        {
+            if (year < 2000 || year > DateTime.Now.Year)
+            {
+                throw new ArgumentException("Year is out of valid range.");
+            }
+            var monthlyIncome = await _incomeRepository.GetMonthlyIncomeAsync(userId, year);
+            var monthlyExpense = await _expenseRepository.GetMonthlyExpenseAsync(userId, year);
+            var monthlyInvestment = await _investmentRepository.GetMonthlyInvestmentAsync(userId, year);
+
+            return new MonthlySummaryViewModel
+            {
+                Year = year,
+                MonthlyIncome = monthlyIncome,
+                MonthlyExpenses = monthlyExpense,
+                MonthlyInvestments = monthlyInvestment
+            };
+        }
+
+        public async Task<List<int>> GetAvailableYearsAsync(string userId)
+        {
+            var incomeYears = await _incomeRepository.GetYearsWithDataAsync(userId);
+            var expenseYears = await _expenseRepository.GetYearsWithDataAsync(userId);
+            var investmentYears = await _investmentRepository.GetYearsWithDataAsync(userId);
+            var allYears = incomeYears
+                .Union(expenseYears)
+                .Union(investmentYears)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+            // Add current year if not present
+            var currentYear = DateTime.Now.Year;
+            if (!allYears.Contains(currentYear))
+            {
+                allYears.Insert(0, currentYear);
+            }
+            return allYears;
+        }
+    }
+}
