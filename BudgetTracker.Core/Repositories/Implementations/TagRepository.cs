@@ -60,5 +60,20 @@ namespace BudgetTracker.Core.Repositories.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+        public Task<Tag?> GetTagByNameAsync(string name, RecordType context, string userId)
+        {
+            if (context == RecordType.Empty)
+            {
+                // Error
+                throw new ArgumentException("Context cannot be empty when searching for a tag by name.");
+            }
+            else
+            {
+                // Search for the tag with the specified name case-insensitively, context, and userId
+                var tag = _dbSet.FirstOrDefault(t => t.Name.ToLower() == name.ToLower() && t.Context == context && t.UserId == userId);
+                return Task.FromResult(tag);
+            }
+        }
     }
 }

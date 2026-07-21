@@ -8,5 +8,6 @@ namespace BudgetTracker.Core.Repositories.Interfaces
         Task<List<decimal>> GetMonthlyExpenseAsync(string userId, int year);
         Task<IEnumerable<Expense>> GetAllByUserAsync(string userId);
         Task<List<int>> GetYearsWithDataAsync(string userId);
+        Task AddRangeAsync(IEnumerable<Expense> expenses);
     }
 }

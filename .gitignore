@@ -2,6 +2,19 @@
 **/bin/
 **/obj/
 
+# Azure Functions localsettings file
+**/local.settings.json
+
+# Azurite local storage
+__blobstorage__
+__queuestorage__
+AzuriteConfig
+__azurite_db_*.json
+
+
+**/serviceDependencies.local.json
+
+
 # User-specific files
 *.user
 *.userosscache
@@ -52,3 +65,4 @@ docker-compose.override.yml
 
 # Azure Functions local settings
 **/local.settings.json
+/__blobstorage__

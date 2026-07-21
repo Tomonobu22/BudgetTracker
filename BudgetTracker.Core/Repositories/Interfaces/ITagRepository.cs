@@ -10,5 +10,6 @@ namespace BudgetTracker.Core.Repositories.Interfaces
         Task UpdateAsync(Tag tag);
         Task<IEnumerable<Tag>> GetAllTagsAsync(RecordType context, string userId);
         Task<Tag?> GetTagByIdAsync(int tagId);
+        Task<Tag?> GetTagByNameAsync(string name, RecordType context, string userId);
     }
 }

@@ -38,8 +38,11 @@ namespace BudgetTracker.Core.Services.Implementations
         public async Task EnqueueImportAsync(int importId)
         {
             var message = new ImportQueueMessage { ImportId = importId };
-            string json = JsonSerializer.Serialize(message);
-            await _queueClient.SendMessageAsync(json);
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(message);
+            var base64Message = Convert.ToBase64String(bytes);
+            await _queueClient.SendMessageAsync(base64Message);
+            //string json = JsonSerializer.Serialize(message);
+            //await _queueClient.SendMessageAsync(json);
         }
     }
 }

@@ -37,6 +37,8 @@ builder.Services.AddScoped<ITagAppService, TagAppService>();
 builder.Services.AddScoped<IImportAppService, ImportAppService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IImportQueueService, ImportQueueService>();
+builder.Services.AddScoped<IImportProcessingService, ImportProcessingService>();
+builder.Services.AddScoped<ICsvImportService, CsvImportService>();
 
 // Token Validation Parameters
 var tokenValidationParameters = new TokenValidationParameters
