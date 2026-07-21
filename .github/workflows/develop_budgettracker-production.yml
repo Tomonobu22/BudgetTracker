@@ -33,10 +33,10 @@ jobs:
         run: abp install-libs
         
       - name: Build with dotnet
-        run: dotnet build BudgetTracker.csproj --configuration Release
+        run: dotnet build BudgetTracker.Web/BudgetTracker.Web.csproj --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish BudgetTracker.csproj -c Release -o ./publish
+        run: dotnet publish BudgetTracker.Web/BudgetTracker.Web.csproj -c Release -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
