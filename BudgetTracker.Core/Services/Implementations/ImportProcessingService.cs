@@ -1,6 +1,7 @@
 ﻿using BudgetTracker.Core.Enums;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -12,8 +13,9 @@ namespace BudgetTracker.Core.Services.Implementations
         private readonly IExpenseRepository _expenseRepository;
         private readonly IIncomeRepository _incomeRepository;
         private readonly IInvestmentRepository _investmentRepository;
+        private readonly ILogger<ImportProcessingService> _logger;
 
-        public ImportProcessingService(IImportRepository importRepository, IBlobStorageService blobStorageService, ICsvImportService csvImportService, IExpenseRepository expenseRepository, IIncomeRepository incomeRepository, IInvestmentRepository investmentRepository)
+        public ImportProcessingService(IImportRepository importRepository, IBlobStorageService blobStorageService, ICsvImportService csvImportService, IExpenseRepository expenseRepository, IIncomeRepository incomeRepository, IInvestmentRepository investmentRepository, ILogger<ImportProcessingService> logger)
         {
             _importRepository = importRepository;
             _blobStorageService = blobStorageService;
@@ -21,6 +23,7 @@ namespace BudgetTracker.Core.Services.Implementations
             _expenseRepository = expenseRepository;
             _incomeRepository = incomeRepository;
             _investmentRepository = investmentRepository;
+            _logger = logger;
         }
 
         public async Task ProcessImportAsync(int importId, CancellationToken cancellationToken = default)
@@ -56,7 +59,26 @@ namespace BudgetTracker.Core.Services.Implementations
 
                 import.Status = ImportStatus.Completed;
                 import.ProcessedAt = DateTime.UtcNow;
+
+                _logger.LogInformation(
+                    "Before update - Import {Id}, Status={Status}, ProcessedAt={ProcessedAt}",
+                    import.Id,
+                    import.Status,
+                    import.ProcessedAt);
+
                 await _importRepository.UpdateAsync(import);
+
+                var updatedImport = await _importRepository.GetByIdAsync(importId);
+
+                if (updatedImport == null)
+                {
+                    throw new Exception($"Import with ID {importId} not found after update.");
+                }
+                _logger.LogInformation(
+                    "After update - Import {Id}, Status={Status}, ProcessedAt={ProcessedAt}",
+                    updatedImport.Id,
+                    updatedImport.Status,
+                    updatedImport.ProcessedAt);
             } 
             catch (Exception ex)
             {
