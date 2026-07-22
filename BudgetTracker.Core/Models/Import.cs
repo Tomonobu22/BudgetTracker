@@ -11,6 +11,7 @@ namespace BudgetTracker.Core.Models
         public DateTime UploadedAt { get; set; }
         public DateTime? ProcessedAt { get; set; }
         public string? ErrorMessage { get; set; }
+        public RecordType ImportType { get; set; }
         public string UserId { get; set; } = string.Empty;
     }
 }

@@ -26,7 +26,7 @@ namespace BudgetTracker.Core.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<ImportDto> CreateImportAsync(FileUploadRequest request, string userId, CancellationToken cancellationToken)
+        public async Task<ImportDto> CreateImportAsync(FileUploadRequest request, RecordType importType, string userId, CancellationToken cancellationToken)
         {
             var todayUploads = await _importRepository.CountImportsByUserAndDateAsync(userId, DateTime.UtcNow, cancellationToken);
             if (todayUploads >= DailyUploadLimit)
@@ -40,7 +40,8 @@ namespace BudgetTracker.Core.Services.Implementations
                 BlobName = $"imports/{Guid.NewGuid()}{Path.GetExtension(request.FileName)}",
                 UserId = userId,
                 Status = ImportStatus.Pending,
-                UploadedAt = DateTime.UtcNow
+                UploadedAt = DateTime.UtcNow,
+                ImportType = importType
             };
 
             // Create import entity

@@ -9,5 +9,7 @@ namespace BudgetTracker.Core.DTOs
         public string BlobName { get; set; } = string.Empty;
         public ImportStatus Status { get; set; }
         public DateTime UploadedAt { get; set; }
+        public DateTime? ProcessedAt { get; set; }
+        public RecordType ImportType { get; set; }
     }
 }

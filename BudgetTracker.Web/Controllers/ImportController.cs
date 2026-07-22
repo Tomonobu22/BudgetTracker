@@ -1,4 +1,5 @@
 ﻿using BudgetTracker.Core.DTOs;
+using BudgetTracker.Core.Enums;
 using BudgetTracker.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +19,14 @@ namespace BudgetTracker.Controllers
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var imports = await _importAppService.GetAllByUserAsync(CurrentUserId);
+            return View(imports);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ImportCsv(IFormFile file, CancellationToken cancellationToken)
+        public async Task<IActionResult> ImportCsv(IFormFile file, RecordType importType, CancellationToken cancellationToken)
         {
             if (file == null || file.Length == 0)
             {
@@ -54,7 +56,7 @@ namespace BudgetTracker.Controllers
                 ContentType = file.ContentType
             };
 
-            var import = await _importAppService.CreateImportAsync(uploadRequest, CurrentUserId, cancellationToken);
+            var import = await _importAppService.CreateImportAsync(uploadRequest, importType, CurrentUserId, cancellationToken);
             return RedirectToAction(nameof(Details), new { id = import.Id });
         }
 

@@ -71,5 +71,14 @@ namespace BudgetTracker.Core.Repositories.Implementations
                 .Distinct()
                 .ToListAsync();
         }
+
+        public Task AddRangeAsync(IEnumerable<Income> incomes)
+        {
+            foreach (var income in incomes)
+            {
+                _dbSet.Add(income);
+            }
+            return _context.SaveChangesAsync();
+        }
     }
 }
