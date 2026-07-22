@@ -26,6 +26,10 @@ namespace BudgetTracker.Controllers
         // GET: Investment
         public async Task<IActionResult> Index()
         {
+            // For add new
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
+
             var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
             var types = investments.Select(i => i.Tag?.Name).Distinct().ToList();
             ViewBag.Types = types;
@@ -51,31 +55,6 @@ namespace BudgetTracker.Controllers
             return PartialView("_InvestmentTablePartial", investments);
         }
 
-
-        // GET: Investment/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var investment = await _investmentAppService.GetByIdAsync(id.Value, CurrentUserId);
-            if (investment == null)
-            {
-                return NotFound();
-            }
-
-            return View(investment);
-        }
-
-        // GET: Investment/Create
-        public IActionResult Create()
-        {
-            var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
-            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View();
-        }
 
         // POST: Investment/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -103,8 +82,7 @@ namespace BudgetTracker.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Investment/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditModal(int? id)
         {
             if (id == null)
             {
@@ -118,7 +96,7 @@ namespace BudgetTracker.Controllers
             }
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View(investment);
+            return PartialView("_EditModal", investment);
         }
 
         // POST: Investment/Edit/5

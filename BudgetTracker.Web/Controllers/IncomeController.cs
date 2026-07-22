@@ -27,6 +27,10 @@ namespace BudgetTracker.Controllers
         // GET: Income
         public async Task<IActionResult> Index()
         {
+            // For add new
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
+
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             var source = incomes.Select(i => i.Tag?.Name).Distinct().ToList();
             ViewBag.Sources = source;
@@ -34,12 +38,16 @@ namespace BudgetTracker.Controllers
         }
 
         // GET: Filtered Income
-        public async Task<IActionResult> Filter(string? source, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Filter(string? source, string? description, DateTime? startDate, DateTime? endDate)
         {
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(source))
             {
                 incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.ToLower() == source.ToLower());
+            }
+            if (!string.IsNullOrEmpty(description))
+            {
+                incomes = incomes.Where(i => i.Description != null && i.Description.Contains(description, StringComparison.CurrentCultureIgnoreCase));
             }
             if (startDate.HasValue)
             {
@@ -53,37 +61,12 @@ namespace BudgetTracker.Controllers
             return PartialView("_IncomeTablePartial", incomes);
         }
 
-        // GET: Income/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var income = await _incomeAppService.GetByIdAsync(id.Value, CurrentUserId);
-            if (income == null)
-            {
-                return NotFound();
-            }
-
-            return View(income);
-        }
-
-        // GET: Income/Create
-        public IActionResult Create()
-        {
-            var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
-            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View();
-        }
-
         // POST: Income/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateReceived")] IncomeDto income, string? newTagName)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Description,Amount,DateReceived")] IncomeDto income, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {
@@ -104,8 +87,7 @@ namespace BudgetTracker.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Income/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditModal(int? id)
         {
             if (id == null)
             {
@@ -119,7 +101,7 @@ namespace BudgetTracker.Controllers
             }
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View(income);
+            return PartialView("_EditModal", income);
         }
 
         // POST: Income/Edit/5
@@ -128,7 +110,7 @@ namespace BudgetTracker.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateReceived")] IncomeDto dto, string? newTagName)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Description,Amount,DateReceived")] IncomeDto dto, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {

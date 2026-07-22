@@ -1,13 +1,136 @@
-﻿@model BudgetTracker.Core.DTOs.ImportDto
+﻿@model BudgetTracker.Web.ViewModels.ImportDetailsViewModel
+@using BudgetTracker.Core.Enums
 
 @{
     ViewData["Title"] = "Import Details";
 }
 
-<h2>Import Details</h2>
-<div>
-    <p><strong>File ID:</strong> @Model.Id</p>
-    <p><strong>File Name:</strong> @Model.FileName</p>
-    <p><strong>Uploaded At:</strong> @Model.UploadedAt</p>
-    <p><strong>Status:</strong> @Model.Status</p>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="col-8">
+                <h4 class="mb-3">Import Details</h4>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <small class="text-muted d-block">File Name</small>
+                        <span class="fw-semibold">@Model.Import.FileName</span>
+                    </div>
+
+                    <div class="col-md-2">
+                        <small class="text-muted d-block">File ID</small>
+                        <span class="fw-semibold">@Model.Import.Id</span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <small class="text-muted d-block">Uploaded At</small>
+                        <span class="fw-semibold">
+                            @Model.Import.UploadedAt.ToLocalTime().ToString("g")
+                        </span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <small class="text-muted d-block">Status</small>
+                        @switch (Model.Import.Status)
+                        {
+                            case ImportStatus.Completed:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+
+                            case ImportStatus.InProgress:
+                                <span class="badge bg-primary">Processing</span>
+                                break;
+
+                            case ImportStatus.Failed:
+                                <span class="badge bg-danger">Failed</span>
+                                break;
+
+                            default:
+                                <span class="badge bg-secondary">
+                                    @Model.Import.Status
+                                </span>
+                                break;
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Back to Imports
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
+@* If the import is completed, display the related records *@
+@if (Model.Import.Status == ImportStatus.Completed)
+{
+    <h3>Imported Records</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Record ID</th>
+                <th>Tag</th>
+                @if (Model.Import.ImportType != RecordType.Investment)
+                {
+                    <th>Description</th>
+                }
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Need to check if the ImportType is expense, income or investment  *@
+            @if (Model.Import.ImportType == RecordType.Expense && Model.Expenses != null)
+            {
+                foreach (var record in Model.Expenses)
+                {
+                    <tr>
+                        <td>@record.Id</td>
+                        <td>@record.Tag?.Name</td>
+                        <td>@record.Description</td>
+                        <td>@record.Amount</td>
+                        <td>@record.DateIncurred.ToShortDateString()</td>
+                    </tr>
+                }
+            }
+            else if (Model.Import.ImportType == RecordType.Income && Model.Incomes != null)
+            {
+                foreach (var record in Model.Incomes)
+                {
+                    <tr>
+                        <td>@record.Id</td>
+                        <td>@record.Tag?.Name</td>
+                        <td>@record.Description</td>
+                        <td>@record.Amount</td>
+                        <td>@record.DateReceived.ToShortDateString()</td>
+                    </tr>
+                }
+            }
+            else if (Model.Import.ImportType == RecordType.Investment && Model.Investments != null)
+            {
+                foreach (var record in Model.Investments)
+                {
+                    <tr>
+                        <td>@record.Id</td>
+                        <td>@record.Tag?.Name</td>
+                        <td>@record.Amount</td>
+                        <td>@record.DateInvested.ToShortDateString()</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+else if (Model.Import.Status == ImportStatus.Failed)
+{
+    <div class="alert alert-danger" role="alert">
+        The import has failed. Please check the logs for more details.
+    </div>
+}
+else
+{
+    <p>The import is still in progress. Please check back later.</p>
+}

@@ -23,8 +23,8 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash3"></i></a>
                 </td>
             </tr>
         }

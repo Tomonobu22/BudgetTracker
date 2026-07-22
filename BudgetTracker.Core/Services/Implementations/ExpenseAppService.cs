@@ -58,5 +58,11 @@ namespace BudgetTracker.Core.Services.Implementations
                 await _expenseRepository.DeleteAsync(expense);
             }
         }
+
+        public async Task<List<ExpenseDto>> GetExpensesByImportIdAsync(int importId, string userId)
+        {
+            var expenses = await _expenseRepository.GetAllFromImportIdAsync(importId, userId);
+            return _mapper.Map<List<ExpenseDto>>(expenses);
+        }
     }
 }

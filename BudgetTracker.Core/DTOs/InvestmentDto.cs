@@ -10,5 +10,6 @@ namespace BudgetTracker.Core.DTOs
         public decimal Amount { get; set; }
         public DateTime DateInvested { get; set; }
         public decimal CurrentValue { get; set; }
+        public int? ImportId { get; set; }
     }
 }

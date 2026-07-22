@@ -7,7 +7,9 @@ namespace BudgetTracker.Core.DTOs
         public int Id { get; set; }
         public int? TagId { get; set; }
         public Tag? Tag { get; set; }
+        public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime DateReceived { get; set; }
+        public int? ImportId { get; set; }
     }
 }

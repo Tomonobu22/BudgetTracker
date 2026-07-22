@@ -1,5 +1,7 @@
 ﻿using BudgetTracker.Core.DTOs;
+using BudgetTracker.Core.Enums;
 using BudgetTracker.Core.Services.Interfaces;
+using BudgetTracker.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -11,20 +13,27 @@ namespace BudgetTracker.Controllers
     {
         private readonly IImportAppService _importAppService;
         private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
+        private readonly IExpenseAppService _expenseAppService;
+        private readonly IIncomeAppService _incomeAppService;
+        private readonly IInvestmentAppService _investmentAppService;
 
-        public ImportController(IImportAppService importAppService) {
+        public ImportController(IImportAppService importAppService, IExpenseAppService expenseAppService, IIncomeAppService incomeAppService, IInvestmentAppService investmentAppService) {
             _importAppService = importAppService;
+            _expenseAppService = expenseAppService;
+            _incomeAppService = incomeAppService;
+            _investmentAppService = investmentAppService;
         }
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var imports = await _importAppService.GetAllByUserAsync(CurrentUserId);
+            return View(imports);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ImportCsv(IFormFile file, CancellationToken cancellationToken)
+        public async Task<IActionResult> ImportCsv(IFormFile file, RecordType importType, CancellationToken cancellationToken)
         {
             if (file == null || file.Length == 0)
             {
@@ -54,8 +63,15 @@ namespace BudgetTracker.Controllers
                 ContentType = file.ContentType
             };
 
-            var import = await _importAppService.CreateImportAsync(uploadRequest, CurrentUserId, cancellationToken);
+            var import = await _importAppService.CreateImportAsync(uploadRequest, importType, CurrentUserId, cancellationToken);
             return RedirectToAction(nameof(Details), new { id = import.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _importAppService.DeleteAsync(id, CurrentUserId);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Import/Details/5
@@ -69,7 +85,32 @@ namespace BudgetTracker.Controllers
             try
             {
                 var importDto = await _importAppService.GetByIdAsync(id, userId);
-                return View(importDto);
+                if (importDto == null)
+                {
+                    return NotFound();
+                }
+
+                var viewModel = new ImportDetailsViewModel
+                {
+                    Import = importDto
+                };
+
+                if (importDto.Status == ImportStatus.Completed)
+                { 
+                    switch (importDto.ImportType)
+                    {
+                        case RecordType.Expense:
+                            viewModel.Expenses = await _expenseAppService.GetExpensesByImportIdAsync(importDto.Id, userId);
+                            break;
+                        case RecordType.Income:
+                            viewModel.Incomes = await _incomeAppService.GetIncomesByImportIdAsync(importDto.Id, userId);
+                            break;
+                        case RecordType.Investment:
+                            viewModel.Investments = await _investmentAppService.GetInvestmentsByImportIdAsync(importDto.Id, userId);
+                            break;
+                    }
+                }
+                return View(viewModel);
             }
             catch (KeyNotFoundException)
             {
