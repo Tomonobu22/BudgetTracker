@@ -32,5 +32,24 @@ namespace BudgetTracker.Core.Repositories.Implementations
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<T>> GetAllFromImportIdAsync(int importId, string userId)
+        {
+            return await _dbSet
+                .Where(e => EF.Property<int>(e, "ImportId") == importId && EF.Property<string>(e, "UserId") == userId).Include(e => EF.Property<object>(e, "Tag"))
+                .ToListAsync();
+        }
+
+        public async Task DeleteByImportIdAsync(int importId, string userId)
+        {
+            var entitiesToDelete = await _dbSet
+                .Where(e => EF.Property<int>(e, "ImportId") == importId && EF.Property<string>(e, "UserId") == userId)
+                .ToListAsync();
+            if (entitiesToDelete.Any())
+            {
+                _dbSet.RemoveRange(entitiesToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

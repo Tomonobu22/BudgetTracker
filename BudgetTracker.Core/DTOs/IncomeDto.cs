@@ -10,5 +10,6 @@ namespace BudgetTracker.Core.DTOs
         public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime DateReceived { get; set; }
+        public int? ImportId { get; set; }
     }
 }

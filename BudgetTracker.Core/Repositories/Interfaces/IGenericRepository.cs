@@ -7,5 +7,7 @@
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(T entity);
+        Task<IEnumerable<T>> GetAllFromImportIdAsync(int importId, string userId); 
+        Task DeleteByImportIdAsync(int importId, string userId);
     }
 }

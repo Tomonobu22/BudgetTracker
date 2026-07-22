@@ -14,7 +14,7 @@ namespace BudgetTracker.Core.Services.Implementations
             _tagRepository = tagRepository;
         }
 
-        async Task<IEnumerable<Expense>> ICsvImportService.ParseExpenseAsync(Stream csvStream, string userId, CancellationToken cancellationToken = default)
+        async Task<IEnumerable<Expense>> ICsvImportService.ParseExpenseAsync(Stream csvStream, int importId, string userId, CancellationToken cancellationToken = default)
         {
             var expenses = new List<Expense>();
             using var reader = new StreamReader(csvStream);
@@ -56,14 +56,15 @@ namespace BudgetTracker.Core.Services.Implementations
                     Description = values[1],
                     TagId = tag.Id,
                     Amount = decimal.TryParse(values[3], out var amount) ? amount : 0,
-                    UserId = userId
+                    UserId = userId,
+                    ImportId = importId
                 }
                 );
             }
             return expenses;
         }
 
-        async Task<IEnumerable<Income>> ICsvImportService.ParseIncomeAsync(Stream csvStream, string userId, CancellationToken cancellationToken = default)
+        async Task<IEnumerable<Income>> ICsvImportService.ParseIncomeAsync(Stream csvStream, int importId, string userId, CancellationToken cancellationToken = default)
         {
             var incomes = new List<Income>();
             using var reader = new StreamReader(csvStream);
@@ -105,14 +106,15 @@ namespace BudgetTracker.Core.Services.Implementations
                     Description = values[1],
                     TagId = tag.Id,
                     Amount = decimal.TryParse(values[3], out var amount) ? amount : 0,
-                    UserId = userId
+                    UserId = userId,
+                    ImportId = importId
                 }
                 );
             }
             return incomes;
         }
 
-        async Task<IEnumerable<Investment>> ICsvImportService.ParseInvestmentAsync(Stream csvStream, string userId, CancellationToken cancellationToken = default)
+        async Task<IEnumerable<Investment>> ICsvImportService.ParseInvestmentAsync(Stream csvStream, int importId, string userId, CancellationToken cancellationToken = default)
         {
             var investments = new List<Investment>();
             using var reader = new StreamReader(csvStream);
@@ -153,7 +155,8 @@ namespace BudgetTracker.Core.Services.Implementations
                     DateInvested = DateTime.TryParse(values[0], out var date) ? date : DateTime.MinValue,
                     TagId = tag.Id,
                     Amount = decimal.TryParse(values[2], out var amount) ? amount : 0,
-                    UserId = userId
+                    UserId = userId,
+                    ImportId = importId
                 }
                 );
             }

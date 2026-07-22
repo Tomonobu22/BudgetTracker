@@ -24,17 +24,22 @@
             </div>
 
             <div class="col-md-3">
+                <label class="form-label">Income Description</label>
+                <input type="text" id="description" class="form-control" placeholder="Enter description" />
+            </div>
+
+            <div class="col-md-2">
                 <label class="form-label fw-semibold">From Date</label>
                 <input type="date" id="startDate" class="form-control" />
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label fw-semibold">To Date</label>
                 <input type="date" id="endDate" class="form-control" />
             </div>
 
-            <div class="col-md-3 d-flex justify-content-end">
-                <button id="filterBtn" class="btn btn-primary me-2">
+            <div class="col-md-2 d-flex justify-content-end">
+                <button id="filterBtn" class="btn btn-outline-primary me-2">
                     <i class="bi bi-search"></i> Filter
                 </button>
                 <button id="clearBtn" class="btn btn-outline-secondary">
@@ -52,23 +57,25 @@
 @section Scripts {
     <script>
         var currentSource = $('#source').val();
+        var currentDescription = $('#description').val();
         var currentStartDate = $('#startDate').val();
         var currentEndDate = $('#endDate').val();
 
         // Function to load filtered data via AJAX
-        function loadFilteredData(source, startDate, endDate) {
+        function loadFilteredData(source, description, startDate, endDate) {
                $.ajax({
                    url: '@Url.Action("Filter", "Income")',
                    type: 'GET',
-                   data: { source: source, startDate: startDate, endDate: endDate },
+                   data: { source: source, description: description, startDate: startDate, endDate: endDate },
                    success: function (result) {
                        $('#incomeTableContainer').html(result);
                        // Update current filter values
                         currentSource = source;
+                        currentDescription = description;
                         currentStartDate = startDate;
                         currentEndDate = endDate;
                         // Toggle "Filtered" label visibility
-                        if (source || startDate || endDate) {
+                        if (source || description || startDate || endDate) {
                             $('#filteredLabel').removeClass('d-none');
                         } else {
                             $('#filteredLabel').addClass('d-none');
@@ -84,26 +91,31 @@
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
             var source = $('#source').val();
+            var description = $('#description').val();
             var startDate = $('#startDate').val();
             var endDate = $('#endDate').val();
-            if (source === currentSource && startDate === currentStartDate && endDate === currentEndDate) {
+            if (source === currentSource && 
+                description === currentDescription && 
+                startDate === currentStartDate && 
+                endDate === currentEndDate) {
                 return; // No changes in filters
             }
-            loadFilteredData(source, startDate, endDate);
+            loadFilteredData(source, description, startDate, endDate);
         });
 
         // Clear filters
         $('#clearBtn').on('click', function (e) {
             e.preventDefault();
             $('#source').val('');
+            $('#description').val('');
             $('#startDate').val('');
             $('#endDate').val('');
 
             // No filters to clear.
-            if (!currentSource && !currentStartDate && !currentEndDate) {
+            if (!currentSource && !currentDescription && !currentStartDate && !currentEndDate) {
                 return;
             }
-            loadFilteredData('', '', '');
+            loadFilteredData('', '', '', '');
         });
     </script>
 }

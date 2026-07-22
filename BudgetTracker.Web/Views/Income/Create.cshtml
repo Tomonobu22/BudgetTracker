@@ -25,6 +25,14 @@
             </div>
 
             <div class="mb-3 row align-items-center">
+                <label class="col-sm-3 col-form-label text-end pe-3"><strong>Description:</strong></label>
+                <div class="col-sm-9">
+                    <input asp-for="Description" class="form-control" placeholder="Enter description"></input>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3 row align-items-center">
                 <label class="col-sm-3 col-form-label text-end pe-3"><strong>Amount:</strong></label>
                 <div class="col-sm-9">
                     <input asp-for="Amount" class="form-control" placeholder="Enter amount" />

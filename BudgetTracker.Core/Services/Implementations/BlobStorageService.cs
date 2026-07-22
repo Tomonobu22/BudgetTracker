@@ -15,6 +15,12 @@ namespace BudgetTracker.Core.Services.Implementations
             _blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
         }
 
+        public async Task DeleteAsync(string blobName, CancellationToken cancellationToken = default)
+        {
+            var blobClient = _blobContainerClient.GetBlobClient(blobName);
+            await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+        }
+
         public async Task<Stream> DownloadAsync(string blobName, CancellationToken cancellationToken = default)
         {
             var blobClient = _blobContainerClient.GetBlobClient(blobName);

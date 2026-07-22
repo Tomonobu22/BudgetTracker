@@ -1,6 +1,7 @@
 ﻿using BudgetTracker.Core.DTOs;
 using BudgetTracker.Core.Enums;
 using BudgetTracker.Core.Services.Interfaces;
+using BudgetTracker.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,9 +13,15 @@ namespace BudgetTracker.Controllers
     {
         private readonly IImportAppService _importAppService;
         private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
+        private readonly IExpenseAppService _expenseAppService;
+        private readonly IIncomeAppService _incomeAppService;
+        private readonly IInvestmentAppService _investmentAppService;
 
-        public ImportController(IImportAppService importAppService) {
+        public ImportController(IImportAppService importAppService, IExpenseAppService expenseAppService, IIncomeAppService incomeAppService, IInvestmentAppService investmentAppService) {
             _importAppService = importAppService;
+            _expenseAppService = expenseAppService;
+            _incomeAppService = incomeAppService;
+            _investmentAppService = investmentAppService;
         }
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -60,6 +67,13 @@ namespace BudgetTracker.Controllers
             return RedirectToAction(nameof(Details), new { id = import.Id });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _importAppService.DeleteAsync(id, CurrentUserId);
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Import/Details/5
         public async Task<IActionResult> Details(int id)
         {
@@ -71,7 +85,32 @@ namespace BudgetTracker.Controllers
             try
             {
                 var importDto = await _importAppService.GetByIdAsync(id, userId);
-                return View(importDto);
+                if (importDto == null)
+                {
+                    return NotFound();
+                }
+
+                var viewModel = new ImportDetailsViewModel
+                {
+                    Import = importDto
+                };
+
+                if (importDto.Status == ImportStatus.Completed)
+                { 
+                    switch (importDto.ImportType)
+                    {
+                        case RecordType.Expense:
+                            viewModel.Expenses = await _expenseAppService.GetExpensesByImportIdAsync(importDto.Id, userId);
+                            break;
+                        case RecordType.Income:
+                            viewModel.Incomes = await _incomeAppService.GetIncomesByImportIdAsync(importDto.Id, userId);
+                            break;
+                        case RecordType.Investment:
+                            viewModel.Investments = await _investmentAppService.GetInvestmentsByImportIdAsync(importDto.Id, userId);
+                            break;
+                    }
+                }
+                return View(viewModel);
             }
             catch (KeyNotFoundException)
             {

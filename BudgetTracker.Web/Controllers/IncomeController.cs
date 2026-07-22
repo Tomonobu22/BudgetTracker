@@ -34,12 +34,16 @@ namespace BudgetTracker.Controllers
         }
 
         // GET: Filtered Income
-        public async Task<IActionResult> Filter(string? source, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Filter(string? source, string? description, DateTime? startDate, DateTime? endDate)
         {
             var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
             if (!string.IsNullOrEmpty(source))
             {
                 incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.ToLower() == source.ToLower());
+            }
+            if (!string.IsNullOrEmpty(description))
+            {
+                incomes = incomes.Where(i => i.Description != null && i.Description.Contains(description, StringComparison.CurrentCultureIgnoreCase));
             }
             if (startDate.HasValue)
             {
@@ -83,7 +87,7 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateReceived")] IncomeDto income, string? newTagName)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Description,Amount,DateReceived")] IncomeDto income, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {
@@ -128,7 +132,7 @@ namespace BudgetTracker.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateReceived")] IncomeDto dto, string? newTagName)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Description,Amount,DateReceived")] IncomeDto dto, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {

@@ -66,5 +66,11 @@ namespace BudgetTracker.Core.Services.Implementations
             }
             throw new KeyNotFoundException("Expense not found or access denied.");
         }
+
+        public async Task<List<IncomeDto>> GetIncomesByImportIdAsync(int importId, string userId)
+        {
+            var incomes = await _incomeRepository.GetAllFromImportIdAsync(importId, userId);
+            return _mapper.Map<List<IncomeDto>>(incomes);
+        }
     }
 }

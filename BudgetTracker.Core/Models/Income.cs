@@ -10,6 +10,7 @@ namespace BudgetTracker.Core.Models
         public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime DateReceived { get; set; }
+        public int? ImportId { get; set; }
         public string UserId { get; set; } = string.Empty;
     }
 }

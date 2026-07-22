@@ -38,15 +38,15 @@ namespace BudgetTracker.Core.Services.Implementations
                 switch (import.ImportType)
                 {
                     case RecordType.Expense:
-                        var expenses = await _csvImportService.ParseExpenseAsync(stream, import.UserId, cancellationToken);
+                        var expenses = await _csvImportService.ParseExpenseAsync(stream, importId, import.UserId, cancellationToken);
                         await _expenseRepository.AddRangeAsync(expenses);
                         break;
                     case RecordType.Income:
-                        var incomes = await _csvImportService.ParseIncomeAsync(stream, import.UserId, cancellationToken);
+                        var incomes = await _csvImportService.ParseIncomeAsync(stream, importId, import.UserId, cancellationToken);
                         await _incomeRepository.AddRangeAsync(incomes);
                         break;
                     case RecordType.Investment:
-                        var investments = await _csvImportService.ParseInvestmentAsync(stream, import.UserId, cancellationToken);
+                        var investments = await _csvImportService.ParseInvestmentAsync(stream, importId, import.UserId, cancellationToken);
                         await _investmentRepository.AddRangeAsync(investments);
                         break;
                     default:
