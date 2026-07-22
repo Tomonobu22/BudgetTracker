@@ -1,0 +1,47 @@
+﻿@model BudgetTracker.Core.DTOs.ExpenseDto
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" id="newTagName" name="newTagName" />
+    <div class="mb-3 row align-items-center">
+        <label asp-for="TagId" class="col-sm-4 col-form-label text-end pe-3">Category</label>
+        <div class="col-sm-8">
+            <select asp-for="TagId" class="form-control" asp-items="ViewBag.Tags"></select>
+        </div>
+        <span asp-validation-for="TagId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 row align-items-center">
+        <label asp-for="Description" class="col-sm-4 col-form-label text-end pe-3"></label>
+        <div class="col-sm-8">
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3 row align-items-center">
+        <label asp-for="Amount" class="col-sm-4 col-form-label text-end pe-3"></label>
+        <div class="col-sm-8">
+            <input asp-for="Amount" class="form-control" />
+            <span asp-validation-for="Amount" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3 row align-items-center">
+        <label asp-for="DateIncurred" class="col-sm-4 col-form-label text-end pe-3">Date Incurred</label>
+        <div class="col-sm-8">
+            <input asp-for="DateIncurred" class="form-control" type="date"/>
+            <span asp-validation-for="DateIncurred" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

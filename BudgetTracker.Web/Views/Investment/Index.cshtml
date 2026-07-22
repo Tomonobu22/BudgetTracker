@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="mb-0">@ViewData["Title"]</h1>
-    <a class="btn btn-primary" asp-action="Create">Add New Investment</a>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvestmentModal">Add New Investment</button>
 </div>
 
 <div class="card shadow-sm mb-4">
@@ -47,6 +47,36 @@
 
 <div id="investmentTableContainer">
     <partial name="_InvestmentTablePartial" model="Model" />
+</div>
+
+<div class="modal fade" id="addInvestmentModal" tabindex="-1" aria-labelledby="addInvestmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addInvestmentModalLabel">Add New Investment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <partial name="_CreateModal" model="new BudgetTracker.Core.DTOs.InvestmentDto()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Investment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="editInvestmentContainer">
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -104,6 +134,26 @@
                 return;
             }
             loadFilteredData('', '', '');
+        });
+
+        // Load edit form in modal
+        $('#editModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var investmentId = button.data('id');
+            var container = $('#editInvestmentContainer');
+            container.html('Loading...');
+
+            $.ajax({
+                url: '@Url.Action("EditModal", "Investment")',
+                type: 'GET',
+                data: { id: investmentId },
+                success: function (result) {
+                    container.html(result);
+                },
+                error: function () {
+                    container.html('Error loading data.');
+                }
+            });
         });
     </script>
 }

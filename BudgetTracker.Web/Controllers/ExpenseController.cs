@@ -35,6 +35,10 @@ namespace BudgetTracker.Controllers
         // GET: Expense
         public async Task<IActionResult> Index()
         {
+            // For add new
+            var tags = _tagAppService.GetAllTagsAsync(RecordType.Expense, CurrentUserId);
+            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
+
             var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
             var categories = expenses.Select(e => e.Tag?.Name).Distinct().ToList();
             ViewBag.Categories = categories;
@@ -64,31 +68,6 @@ namespace BudgetTracker.Controllers
             return PartialView("_ExpenseTablePartial", expenses);
         }
 
-        // GET: Expense/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var expense = await _expenseAppService.GetByIdAsync(id.Value, CurrentUserId);
-            if (expense == null)
-            {
-                return NotFound();
-            }
-
-            return View(expense);
-        }
-
-        // GET: Expense/Create
-        public IActionResult Create()
-        {
-            var tags = _tagAppService.GetAllTagsAsync(RecordType.Expense, CurrentUserId);
-            ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View();
-        }
-
         // POST: Expense/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -115,8 +94,7 @@ namespace BudgetTracker.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Expense/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditModal(int? id)
         {
             if (id == null)
             {
@@ -131,7 +109,7 @@ namespace BudgetTracker.Controllers
 
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Expense, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
-            return View(expense);
+            return PartialView("_EditModal", expense);
         }
 
         // POST: Expense/Edit/5

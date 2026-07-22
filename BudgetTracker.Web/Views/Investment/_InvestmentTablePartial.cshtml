@@ -34,9 +34,19 @@
                 <td>@item.DateInvested.ToShortDateString()</td>
                 <td>@item.CurrentValue.ToString("C")</td>
                 <td>
-                    <a class="btn btn-sm btn-secondary" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                    <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.Id" title="Details"><i class="bi bi-search"></i></a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash3"></i></a>
+                    <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id" title="Edit"><i class="bi bi-pencil-square"></i></button>
+                    <form asp-action="Delete"
+                          asp-route-id="@item.Id"
+                          method="post"
+                          class="d-inline">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-outline-danger"
+                                title="Delete"
+                                onclick="return confirm('Are you sure you want to delete this investment?');">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
                 </td>
             </tr>
         }
