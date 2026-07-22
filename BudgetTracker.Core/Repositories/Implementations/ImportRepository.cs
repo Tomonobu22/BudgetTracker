@@ -34,11 +34,5 @@ namespace BudgetTracker.Core.Repositories.Implementations
                 .CountAsync(cancellationToken);
             return count;
         }
-
-        public override async Task UpdateAsync(Import import)
-        {
-            _dbSet.Update(import);
-            await _context.SaveChangesAsync();
-        }
     }
 }
