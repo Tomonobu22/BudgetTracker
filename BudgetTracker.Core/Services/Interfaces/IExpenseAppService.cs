@@ -4,6 +4,7 @@ namespace BudgetTracker.Core.Services.Interfaces
 {
     public interface IExpenseAppService
     {
+        Task<PagedResultDto<ExpenseDto>> GetPagedByUserAsync(string userId, PagingRequestDto request, ExpenseFilterDto? filter = null);
         Task<IEnumerable<ExpenseDto>> GetAllByUserAsync(string userId);
         Task<List<ExpenseDto>> GetExpensesByImportIdAsync(int importId, string userId);
         Task<ExpenseDto> GetByIdAsync(int id, string userId);

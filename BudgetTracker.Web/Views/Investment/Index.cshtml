@@ -1,15 +1,16 @@
-﻿@model IEnumerable<BudgetTracker.Core.DTOs.InvestmentDto>
+﻿@using BudgetTracker.Core.DTOs;
+@model PagedResultDto<InvestmentDto>
 
 @{
     ViewData["Title"] = "Investment Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">@ViewData["Title"]</h1>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addInvestmentModal">Add New Investment</button>
 </div>
 
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-2">
     <div class="card-body">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
@@ -86,11 +87,11 @@
         var currentEndDate = $('#endDate').val();
 
         // Function to load filtered data via AJAX
-        function loadFilteredData(type, startDate, endDate) {
+        function loadFilteredData(type, startDate, endDate, page) {
                $.ajax({
                    url: '@Url.Action("Filter", "Investment")',
                    type: 'GET',
-                   data: { type: type, startDate: startDate, endDate: endDate },
+                   data: { type: type, startDate: startDate, endDate: endDate, page: page },
                    success: function (result) {
                        $('#investmentTableContainer').html(result);
                        // Update current filter values
@@ -110,6 +111,15 @@
                });
            }
 
+        // Handle pagination click
+        $('#investmentTableContainer').on('click', '.page-link', function (e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            if (!page) return;
+
+            loadFilteredData(currentType, currentStartDate, currentEndDate, page);
+        });
+
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
@@ -119,7 +129,7 @@
             if (type === currentType && startDate === currentStartDate && endDate === currentEndDate) {
                 return; // No changes in filters
             }
-            loadFilteredData(type, startDate, endDate);
+            loadFilteredData(type, startDate, endDate, 1);
         });
 
         // Clear filters
@@ -133,7 +143,7 @@
             if (!currentType && !currentStartDate && !currentEndDate) {
                 return;
             }
-            loadFilteredData('', '', '');
+            loadFilteredData('', '', '', 1);
         });
 
         // Load edit form in modal

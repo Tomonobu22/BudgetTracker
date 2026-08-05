@@ -4,6 +4,7 @@ using BudgetTracker.Core.Enums;
 using BudgetTracker.Core.Models;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -58,6 +59,38 @@ namespace BudgetTracker.Core.Services.Implementations
                 throw new KeyNotFoundException("Tag not found");
             }
             return _mapper.Map<TagDto>(tag);
+        }
+
+        public async Task<PagedResultDto<TagDto>> GetPagedByUserAsync(string userId, PagingRequestDto request, string? searchTerm = null, RecordType? context = RecordType.Empty)
+        {
+            var tag = _tagRepository.Query(userId);
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                tag = tag.Where(t => t.Name.Contains(searchTerm));
+            }
+            if (context != null && context != RecordType.Empty)
+            {
+                tag = tag.Where(t => t.Context == context);
+            }
+
+            var totalCount = await tag.CountAsync();
+
+            var items = await tag
+                .OrderByDescending(t => t.Context).ThenBy(t => t.Name)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .Select(t => _mapper.Map<TagDto>(t))
+                .ToListAsync();
+
+            return new PagedResultDto<TagDto>
+            {
+                Items = items,
+                PageNumber = request.PageNumber,
+                TotalAmount = 0,
+                TotalCount = totalCount,
+                PageSize = request.PageSize
+            };
         }
     }
 }

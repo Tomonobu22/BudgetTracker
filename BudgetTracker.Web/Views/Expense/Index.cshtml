@@ -1,17 +1,18 @@
-﻿@model IEnumerable<BudgetTracker.Core.DTOs.ExpenseDto>
+﻿@using BudgetTracker.Core.DTOs;
+@model PagedResultDto<ExpenseDto>
 
 @{
     ViewData["Title"] = "Expense Dashboard";
 }
 
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">@ViewData["Title"]</h1>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 class="mb-0">@ViewData["Title"]</h3>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">Add New Expense</button>
 </div>
 
 
-<div class="card shadow-sm mb-4">
+<div class="card shadow-sm mb-2">
     <div class="card-body">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
@@ -94,11 +95,11 @@
         var currentEndDate = $('#endDate').val();
 
         // Function to load filtered data via AJAX
-        function loadFilteredData(category, description, startDate, endDate) {;
+        function loadFilteredData(category, description, startDate, endDate, page) {;
                $.ajax({
                    url: '@Url.Action("Filter", "Expense")',
                    type: 'GET',
-                   data: { category: category, description: description, startDate: startDate, endDate: endDate },
+                   data: { category: category, description: description, startDate: startDate, endDate: endDate, page: page },
                    success: function (result) {
                        $('#expenseTableContainer').html(result);
                        // Update current filter values
@@ -120,6 +121,15 @@
 
            }
 
+        // Handle pagination click
+        $('#expenseTableContainer').on('click', '.page-link', function (e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            if (!page) return;
+
+            loadFilteredData(currentCategory, currentDescription, currentStartDate, currentEndDate, page);
+        });
+
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
@@ -135,7 +145,7 @@
                 endDate === currentEndDate) {
                 return;
             }
-            loadFilteredData(category, description, startDate, endDate);
+            loadFilteredData(category, description, startDate, endDate, 1);
         });
 
         // Clear filters
@@ -150,7 +160,7 @@
             if (!currentCategory && !currentDescription && !currentStartDate && !currentEndDate) {
                 return;
             }
-            loadFilteredData('', '', '', '');
+            loadFilteredData('', '', '', '', 1);
         });
 
         // Load edit form in modal

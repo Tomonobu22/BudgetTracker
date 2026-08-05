@@ -24,34 +24,28 @@ namespace BudgetTracker.Controllers
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // GET: Investment
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             // For add new
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
 
-            var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
-            var types = investments.Select(i => i.Tag?.Name).Distinct().ToList();
+            var investments = await _investmentAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 });
+            var types = tags.Result.Select(i => i.Name).Distinct().ToList();
             ViewBag.Types = types;
             return View(investments);
         }
 
         // GET: Filtered Investment
-        public async Task<IActionResult> Filter(string? type, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Filter(string? type, DateTime? startDate, DateTime? endDate, int page = 1)
         {
-            var investments = await _investmentAppService.GetAllByUserAsync(CurrentUserId);
-            if (!string.IsNullOrEmpty(type))
+            var filter = new InvestmentFilterDto
             {
-                investments = investments.Where(i => i.Tag != null && i.Tag.Name.ToLower() == type.ToLower());
-            }
-            if (startDate.HasValue)
-            {
-                investments = investments.Where(i => i.DateInvested >= startDate.Value);
-            }
-            if (endDate.HasValue)
-            {
-                investments = investments.Where(i => i.DateInvested <= endDate.Value);
-            }
+                Type = type,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var investments = await _investmentAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 }, filter);
             return PartialView("_InvestmentTablePartial", investments);
         }
 

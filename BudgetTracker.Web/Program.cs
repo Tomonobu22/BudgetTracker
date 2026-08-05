@@ -39,6 +39,7 @@ builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IImportQueueService, ImportQueueService>();
 builder.Services.AddScoped<IImportProcessingService, ImportProcessingService>();
 builder.Services.AddScoped<ICsvImportService, CsvImportService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 // Token Validation Parameters
 var tokenValidationParameters = new TokenValidationParameters
@@ -125,6 +126,9 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
+
+// Cache
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

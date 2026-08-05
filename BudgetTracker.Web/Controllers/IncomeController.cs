@@ -25,39 +25,29 @@ namespace BudgetTracker.Controllers
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // GET: Income
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             // For add new
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Income, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
 
-            var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
-            var source = incomes.Select(i => i.Tag?.Name).Distinct().ToList();
+            var incomes = await _incomeAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 });
+            var source = tags.Result.Select(t => t.Name).Distinct().ToList();
             ViewBag.Sources = source;
             return View(incomes);
         }
 
         // GET: Filtered Income
-        public async Task<IActionResult> Filter(string? source, string? description, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Filter(string? source, string? description, DateTime? startDate, DateTime? endDate, int page = 1)
         {
-            var incomes = await _incomeAppService.GetAllByUserAsync(CurrentUserId);
-            if (!string.IsNullOrEmpty(source))
+            var filter = new IncomeFilterDto
             {
-                incomes = incomes.Where(i => i.Tag != null && i.Tag.Name.ToLower() == source.ToLower());
-            }
-            if (!string.IsNullOrEmpty(description))
-            {
-                incomes = incomes.Where(i => i.Description != null && i.Description.Contains(description, StringComparison.CurrentCultureIgnoreCase));
-            }
-            if (startDate.HasValue)
-            {
-                incomes = incomes.Where(i => i.DateReceived >= startDate.Value);
-            }
-            if (endDate.HasValue)
-            {
-                incomes = incomes.Where(i => i.DateReceived <= endDate.Value);
-            }
-
+                Source = source,
+                Description = description,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var incomes = await _incomeAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 }, filter);
             return PartialView("_IncomeTablePartial", incomes);
         }
 

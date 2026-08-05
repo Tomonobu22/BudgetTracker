@@ -28,24 +28,16 @@ namespace BudgetTracker.Controllers
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // GET: Tag
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var tags = (await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId)).OrderBy(t => t.Context).ThenBy(t => t.Name);
+            var tags = await _tagAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 });
             return View(tags);
         }
 
         // GET: Filtered Tag
-        public async Task<IActionResult> Filter(RecordType? context, string? tagName)
+        public async Task<IActionResult> Filter(RecordType? context, string? tagName, int page = 1)
         {
-            var tags = await _tagAppService.GetAllTagsAsync(RecordType.Empty, CurrentUserId);
-            if (context != null && context != RecordType.Empty)
-            {
-                tags = tags.Where(t => t.Context == context).OrderBy(t => t.Name);
-            }
-            if (!string.IsNullOrEmpty(tagName))
-            {
-                tags = tags.Where(t => t.Name.Contains(tagName, StringComparison.OrdinalIgnoreCase)).OrderBy(t => t.Name);
-            }
+            var tags = await _tagAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 }, tagName, context);
             return PartialView("_TagTablePartial", tags);
         }
 

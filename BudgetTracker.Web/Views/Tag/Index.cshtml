@@ -1,4 +1,5 @@
-﻿@model IEnumerable<BudgetTracker.Core.DTOs.TagDto>
+﻿@using BudgetTracker.Core.DTOs;
+@model PagedResultDto<TagDto>
 
 @{
     ViewData["Title"] = "Tags";
@@ -46,14 +47,14 @@
 @section Scripts {
     <script>
         // Function to load filtered data via AJAX
-        function loadFilteredData() {
+        function loadFilteredData(page) {
                var context = $('#context').val();
                var tagName = $('#tagName').val();
 
                $.ajax({
                    url: '@Url.Action("Filter")',
                    type: 'GET',
-                   data: { context: context, tagName: tagName },
+                   data: { context: context, tagName: tagName, page: page },
                    success: function (result) {
                        $('#tagTableContainer').html(result);
                    },
@@ -63,18 +64,26 @@
                });
            }
 
+        // Handle pagination click
+        $("#tagTableContainer").on('click', '.page-link', function (e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            if (!page) return;
+            loadFilteredData(page);
+        });
+
         // Trigger filter
         $('#filterBtn').on('click', function (e) {
             e.preventDefault();
-            loadFilteredData();
+            loadFilteredData(1);
         });
 
         // Clear filters
         $('#clearBtn').on('click', function (e) {
             e.preventDefault();
-            $('#context').val('');
+            $('#context').val('Empty');
             $('#tagName').val('');
-            loadFilteredData();
+            loadFilteredData(1);
         });
     </script>
 }
