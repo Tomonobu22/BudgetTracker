@@ -1,6 +1,9 @@
 ﻿using BudgetTracker.Core.Models;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
+using BudgetTracker.Core.Helpers;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -9,15 +12,22 @@ namespace BudgetTracker.Core.Services.Implementations
         private readonly IIncomeRepository _incomeRepository;
         private readonly IExpenseRepository _expenseRepository;
         private readonly IInvestmentRepository _investmentRepository;
+        private readonly ICacheService _cacheService;
+        private readonly ILogger<ReportAppService> _logger;
 
         public ReportAppService(
             IIncomeRepository incomeRepository,
             IExpenseRepository expenseRepository,
-            IInvestmentRepository investmentRepository)
+            IInvestmentRepository investmentRepository,
+            ICacheService cacheService,
+            ILogger<ReportAppService> logger
+            )
         {
             _incomeRepository = incomeRepository;
             _expenseRepository = expenseRepository;
             _investmentRepository = investmentRepository;
+            _cacheService = cacheService;
+            _logger = logger;
         }
 
 
@@ -45,21 +55,43 @@ namespace BudgetTracker.Core.Services.Implementations
             {
                 throw new ArgumentException("Year is out of valid range.");
             }
+
+            var cacheKey = CacheKeys.GetMonthlySummaryKey(userId, year);
+            var cachedMonthlySummary = _cacheService.Get<MonthlySummaryViewModel?>(cacheKey);
+            if (cachedMonthlySummary != null)
+            {
+                _logger.LogInformation($"Cache hit {cacheKey}");
+                return cachedMonthlySummary;
+            }
+
             var monthlyIncome = await _incomeRepository.GetMonthlyIncomeAsync(userId, year);
             var monthlyExpense = await _expenseRepository.GetMonthlyExpenseAsync(userId, year);
             var monthlyInvestment = await _investmentRepository.GetMonthlyInvestmentAsync(userId, year);
-
-            return new MonthlySummaryViewModel
+            
+            var result = new MonthlySummaryViewModel
             {
                 Year = year,
                 MonthlyIncome = monthlyIncome,
                 MonthlyExpenses = monthlyExpense,
                 MonthlyInvestments = monthlyInvestment
             };
+
+            // Cache the result for 10 minutes
+            _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(10));
+            _logger.LogInformation($"Cache set {cacheKey}");
+            return result;
         }
 
         public async Task<List<int>> GetAvailableYearsAsync(string userId)
         {
+            var cacheKey = CacheKeys.AvailableYearsKey(userId);
+            var cachedYears = _cacheService.Get<List<int>>(cacheKey);
+            if (cachedYears != null)
+            {
+                _logger.LogInformation($"Cache hit {cacheKey}");
+                return cachedYears;
+            }
+
             var incomeYears = await _incomeRepository.GetYearsWithDataAsync(userId);
             var expenseYears = await _expenseRepository.GetYearsWithDataAsync(userId);
             var investmentYears = await _investmentRepository.GetYearsWithDataAsync(userId);
@@ -75,6 +107,10 @@ namespace BudgetTracker.Core.Services.Implementations
             {
                 allYears.Insert(0, currentYear);
             }
+
+            // Cache the result for 10 minutes
+            _cacheService.Set(cacheKey, allYears, TimeSpan.FromMinutes(10));
+            _logger.LogInformation($"Cache set {cacheKey}");
             return allYears;
         }
     }

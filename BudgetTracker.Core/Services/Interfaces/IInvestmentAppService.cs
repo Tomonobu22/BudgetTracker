@@ -8,7 +8,7 @@ namespace BudgetTracker.Core.Services.Interfaces
         Task<List<InvestmentDto>> GetInvestmentsByImportIdAsync(int importId, string userId);
         Task<InvestmentDto> GetByIdAsync(int id, string userId);
         Task CreateAsync(InvestmentDto dto, string userId);
-        Task UpdateAsync(InvestmentDto investment, string userId);
+        Task UpdateAsync(InvestmentDto dto, string userId);
         Task DeleteAsync(int id, string userId);
         Task<bool> HasInvestmentsWithTagAsync(int id);
     }

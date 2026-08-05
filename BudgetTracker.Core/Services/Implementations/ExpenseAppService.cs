@@ -3,6 +3,7 @@ using BudgetTracker.Core.DTOs;
 using BudgetTracker.Core.Models;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
+using BudgetTracker.Core.Helpers;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -10,11 +11,13 @@ namespace BudgetTracker.Core.Services.Implementations
     {
         private readonly IExpenseRepository _expenseRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public ExpenseAppService(IExpenseRepository expenseRepository, IMapper mapper)
+        public ExpenseAppService(IExpenseRepository expenseRepository, IMapper mapper, ICacheService cacheService)
         {
             _expenseRepository = expenseRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
         public async Task<IEnumerable<ExpenseDto>> GetAllByUserAsync(string userId)
         {
@@ -43,12 +46,28 @@ namespace BudgetTracker.Core.Services.Implementations
             var expense = _mapper.Map<Expense>(expenseDto);
             expense.UserId = userId;
             await _expenseRepository.AddAsync(expense);
+            _cacheService.Remove(CacheKeys.GetMonthlySummaryKey(userId, expense.DateIncurred.Year));
+            _cacheService.Remove(CacheKeys.AvailableYearsKey(userId));
         }
         public async Task UpdateAsync(ExpenseDto expenseDto, string userId)
         {
-            var expense = _mapper.Map<Expense>(expenseDto);
-            expense.UserId = userId;
+            // Get the previous expense record to check if the year has changed
+            var expense = await _expenseRepository.GetByIdAsync(expenseDto.Id);
+            if (expense == null || expense.UserId != userId)
+            {
+                throw new KeyNotFoundException("Expense not found or access denied.");
+            }
+
+            var oldYear = expense.DateIncurred.Year;
+            _mapper.Map(expenseDto, expense);
+
             await _expenseRepository.UpdateAsync(expense);
+            _cacheService.Remove(CacheKeys.GetMonthlySummaryKey(userId, expense.DateIncurred.Year));
+            if (oldYear != expense.DateIncurred.Year)
+            {
+                _cacheService.Remove(CacheKeys.GetMonthlySummaryKey(userId, oldYear));
+                _cacheService.Remove(CacheKeys.AvailableYearsKey(userId));
+            }
         }
         public async Task DeleteAsync(int id, string userId)
         {
@@ -56,6 +75,8 @@ namespace BudgetTracker.Core.Services.Implementations
             if (expense != null && expense.UserId == userId)
             {
                 await _expenseRepository.DeleteAsync(expense);
+                _cacheService.Remove(CacheKeys.GetMonthlySummaryKey(userId, expense.DateIncurred.Year));
+                _cacheService.Remove(CacheKeys.AvailableYearsKey(userId));
             }
         }
 

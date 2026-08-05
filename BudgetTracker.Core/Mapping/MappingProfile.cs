@@ -8,9 +8,15 @@ namespace BudgetTracker.Core.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<Income, IncomeDto>().ReverseMap();
-            CreateMap<Expense, ExpenseDto>().ReverseMap();
-            CreateMap<Investment, InvestmentDto>().ReverseMap();
+            CreateMap<Income, IncomeDto>();
+            CreateMap<IncomeDto, Income>()
+                .ForMember(dest => dest.Tag, opt => opt.Ignore());
+            CreateMap<Expense, ExpenseDto>();
+            CreateMap<ExpenseDto, Expense>()
+                .ForMember(dest => dest.Tag, opt => opt.Ignore());
+            CreateMap<Investment, InvestmentDto>();
+            CreateMap<InvestmentDto, Investment>()
+                .ForMember(dest => dest.Tag, opt => opt.Ignore());
             CreateMap<Tag, TagDto>().ReverseMap();
             CreateMap<Import, ImportDto>().ReverseMap();
         }
