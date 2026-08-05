@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using BudgetTracker.Core.DTOs;
+using BudgetTracker.Core.Helpers;
 using BudgetTracker.Core.Models;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
-using BudgetTracker.Core.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -84,6 +85,48 @@ namespace BudgetTracker.Core.Services.Implementations
         {
             var expenses = await _expenseRepository.GetAllFromImportIdAsync(importId, userId);
             return _mapper.Map<List<ExpenseDto>>(expenses);
+        }
+
+        public async Task<PagedResultDto<ExpenseDto>> GetPagedByUserAsync(string userId, PagingRequestDto request, ExpenseFilterDto? filter = null)
+        {
+            var expense = _expenseRepository.Query(userId);
+            if (filter != null)
+            {
+                if (!string.IsNullOrEmpty(filter.Category))
+                {
+                    expense = expense.Where(e => e.Tag != null && e.Tag.Name.Contains(filter.Category));
+                }
+                if (!string.IsNullOrEmpty(filter.Description))
+                {
+                    expense = expense.Where(e => e.Description != null && e.Description.Contains(filter.Description));
+                }
+                if (filter.StartDate.HasValue)
+                {
+                    expense = expense.Where(e => e.DateIncurred >= filter.StartDate.Value);
+                }
+                if (filter.EndDate.HasValue)
+                {
+                    expense = expense.Where(e => e.DateIncurred <= filter.EndDate.Value);
+                }
+            }
+
+            var totalCount = await expense.CountAsync();
+            var totalAmount = await expense.SumAsync(e => e.Amount);
+
+            var items = await expense
+                .OrderByDescending(e => e.DateIncurred)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<ExpenseDto>
+            {
+                Items = _mapper.Map<List<ExpenseDto>>(items),
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                TotalAmount = totalAmount
+            };
         }
     }
 }

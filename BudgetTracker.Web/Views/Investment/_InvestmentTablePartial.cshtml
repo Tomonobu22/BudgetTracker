@@ -1,10 +1,8 @@
-﻿@model IEnumerable<BudgetTracker.Core.DTOs.InvestmentDto>
+﻿@using BudgetTracker.Core.DTOs
+@model PagedResultDto<InvestmentDto>
 
-@{
-    var totalFilteredInvestment = Model.Sum(i => i.Amount);
-}
-<div class="alert alert-secondary">
-    <strong>Total <span id="filteredLabel" class="d-none">Filtered</span> Investment:</strong> @totalFilteredInvestment.ToString("C")
+<div class="alert alert-secondary mb-2">
+    <strong>Total <span id="filteredLabel" class="d-none">Filtered</span> Investment:</strong> @Model.TotalAmount.ToString("C")
 </div>
 
 <table class="table table-striped table-hover">
@@ -14,7 +12,7 @@
                 Type
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Amount)
+                Amount
             </th>
             <th>
                 Date Invested
@@ -26,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Items)
         {
             <tr>
                 <td>@item.Tag?.Name</td>
@@ -52,3 +50,31 @@
         }
     </tbody>
 </table>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Income pagination">
+        <ul class="pagination justify-content-center">
+            @if (Model.PageNumber > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="#" data-page="@(Model.PageNumber - 1)">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" href="#" data-page="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.PageNumber < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="#" data-page="@(Model.PageNumber + 1)">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

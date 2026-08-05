@@ -4,6 +4,7 @@ using BudgetTracker.Core.Models;
 using BudgetTracker.Core.Repositories.Interfaces;
 using BudgetTracker.Core.Services.Interfaces;
 using BudgetTracker.Core.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BudgetTracker.Core.Services.Implementations
 {
@@ -84,6 +85,46 @@ namespace BudgetTracker.Core.Services.Implementations
         {
             var investments = await _investmentRepository.GetAllFromImportIdAsync(importId, userId);
             return _mapper.Map<List<InvestmentDto>>(investments);
+        }
+
+        public async Task<PagedResultDto<InvestmentDto>> GetPagedByUserAsync(string userId, PagingRequestDto request, InvestmentFilterDto? filter = null)
+        {
+            var investment = _investmentRepository.Query(userId);
+
+            if (filter != null)
+            { 
+                if (!string.IsNullOrEmpty(filter.Type))
+                {
+                    investment = investment.Where(i => i.Tag != null && i.Tag.Name.ToLower() == filter.Type.ToLower());
+                }
+                if (filter.StartDate.HasValue)
+                {
+                    investment = investment.Where(i => i.DateInvested >= filter.StartDate.Value);
+                }
+                if (filter.EndDate.HasValue)
+                {
+                    investment = investment.Where(i => i.DateInvested <= filter.EndDate.Value);
+                }
+            }
+
+            var totalCount = await investment.CountAsync();
+            var totalAmount = await investment.SumAsync(i => i.Amount);
+
+            var items = await investment
+                .OrderByDescending(i => i.DateInvested)
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<InvestmentDto>
+            {
+                Items = _mapper.Map<List<InvestmentDto>>(items),
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                TotalCount = totalCount,
+                TotalAmount = totalAmount
+            };
+
         }
     }
 }

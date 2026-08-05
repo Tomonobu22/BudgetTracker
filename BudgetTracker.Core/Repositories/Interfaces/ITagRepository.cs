@@ -5,6 +5,7 @@ namespace BudgetTracker.Core.Repositories.Interfaces
 {
     public interface ITagRepository
     {
+        IQueryable<Tag> Query(string userId);
         Task CreateAsync(Tag tag);
         Task RemoveTagAsync(int tagId, string userId);
         Task UpdateAsync(Tag tag);

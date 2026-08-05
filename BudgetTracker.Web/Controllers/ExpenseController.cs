@@ -33,38 +33,29 @@ namespace BudgetTracker.Controllers
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         // GET: Expense
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             // For add new
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Expense, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
 
-            var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
-            var categories = expenses.Select(e => e.Tag?.Name).Distinct().ToList();
+            var expenses = await _expenseAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 });
+            var categories = tags.Result.Select(t => t.Name).Distinct().ToList();
             ViewBag.Categories = categories;
             return View(expenses);
         }
 
         // GET: Filtered Expense
-        public async Task<IActionResult> Filter(string? category, string? description, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> Filter(string? category, string? description, DateTime? startDate, DateTime? endDate, int page = 1)
         {
-            var expenses = await _expenseAppService.GetAllByUserAsync(CurrentUserId);
-            if (!string.IsNullOrEmpty(category))
+            var filter = new ExpenseFilterDto
             {
-                expenses = expenses.Where(e => e.Tag != null && e.Tag.Name.ToLower() == category.ToLower());
-            }
-            if (!string.IsNullOrEmpty(description))
-            {
-                expenses = expenses.Where(e => e.Description.Contains(description, StringComparison.OrdinalIgnoreCase));
-            }
-            if (startDate.HasValue)
-            {
-                expenses = expenses.Where(e => e.DateIncurred >= startDate.Value);
-            }
-            if (endDate.HasValue)
-            {
-                expenses = expenses.Where(e => e.DateIncurred <= endDate.Value);
-            }
+                Category = category,
+                Description = description,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+            var expenses = await _expenseAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 }, filter);
             return PartialView("_ExpenseTablePartial", expenses);
         }
 

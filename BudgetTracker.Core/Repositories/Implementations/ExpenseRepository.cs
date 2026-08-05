@@ -76,5 +76,10 @@ namespace BudgetTracker.Core.Repositories.Implementations
             }
             return _context.SaveChangesAsync();
         }
+
+        public IQueryable<Expense> Query(string userId)
+        {
+            return _dbSet.Where(e => e.UserId == userId).Include(e => e.Tag);
+        }
     }
 }
