@@ -27,11 +27,11 @@
         @foreach (var item in Model.Items)
         {
             <tr>
-                <td>@item.Tag?.Name</td>
-                <td>@item.Amount.ToString("C")</td>
-                <td>@item.DateInvested.ToShortDateString()</td>
-                <td>@item.CurrentValue.ToString("C")</td>
-                <td>
+                <td style="width: 20%;">@item.Tag?.Name</td>
+                <td style="width: 20%;">@item.Amount.ToString("C")</td>
+                <td style="width: 20%;">@item.DateInvested.ToShortDateString()</td>
+                <td style="width: 20%;">@item.CurrentValue.ToString("C")</td>
+                <td style="width: 20%;">
                     <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id" title="Edit"><i class="bi bi-pencil-square"></i></button>
                     <form asp-action="Delete"
                           asp-route-id="@item.Id"
