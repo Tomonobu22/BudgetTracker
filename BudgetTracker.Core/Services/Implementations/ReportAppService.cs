@@ -60,7 +60,7 @@ namespace BudgetTracker.Core.Services.Implementations
             var cachedMonthlySummary = _cacheService.Get<MonthlySummaryViewModel?>(cacheKey);
             if (cachedMonthlySummary != null)
             {
-                _logger.LogInformation($"Cache hit {cacheKey}");
+                _logger.LogDebug($"Cache hit {cacheKey}");
                 return cachedMonthlySummary;
             }
 
@@ -78,7 +78,7 @@ namespace BudgetTracker.Core.Services.Implementations
 
             // Cache the result for 10 minutes
             _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(10));
-            _logger.LogInformation($"Cache set {cacheKey}");
+            _logger.LogDebug($"Cache set {cacheKey}");
             return result;
         }
 
@@ -88,7 +88,7 @@ namespace BudgetTracker.Core.Services.Implementations
             var cachedYears = _cacheService.Get<List<int>>(cacheKey);
             if (cachedYears != null)
             {
-                _logger.LogInformation($"Cache hit {cacheKey}");
+                _logger.LogDebug($"Cache hit {cacheKey}");
                 return cachedYears;
             }
 
@@ -110,7 +110,7 @@ namespace BudgetTracker.Core.Services.Implementations
 
             // Cache the result for 10 minutes
             _cacheService.Set(cacheKey, allYears, TimeSpan.FromMinutes(10));
-            _logger.LogInformation($"Cache set {cacheKey}");
+            _logger.LogDebug($"Cache set {cacheKey}");
             return allYears;
         }
     }

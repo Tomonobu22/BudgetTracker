@@ -41,14 +41,6 @@ namespace BudgetTracker.Controllers
             return PartialView("_TagTablePartial", tags);
         }
 
-        // GET: Tag/Create
-        public IActionResult Create()
-        {
-            List<RecordType> contexts = new List<RecordType> { RecordType.Income, RecordType.Expense, RecordType.Investment };
-            ViewBag.Contexts = new SelectList(contexts);
-            return View();
-        }
-
         // POST: Tag/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -64,8 +56,7 @@ namespace BudgetTracker.Controllers
             return View(tag);
         }
 
-        // GET: Tag/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> EditModal(int? id)
         {
             if (id == null)
             {
@@ -77,8 +68,10 @@ namespace BudgetTracker.Controllers
             {
                 return NotFound();
             }
-            return View(tag);
+
+            return PartialView("_EditModal", tag);
         }
+
 
         // POST: Tag/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -146,12 +139,12 @@ namespace BudgetTracker.Controllers
 
                 if (hasIncomes || hasExpenses || hasInvestments)
                 {
-                    ModelState.AddModelError(string.Empty, "Tag cannot be deleted as it is associated with existing records.");
-                    return View(tag);
+                    TempData["Error"] = "Tag cannot be deleted as it is associated with existing records.";
                 }
                 else
                 {
                     await _tagAppService.RemoveTagAsync(id, CurrentUserId);
+                    TempData["Success"] = "Tag deleted successfully.";
                 }
                 return RedirectToAction(nameof(Index));
             }
