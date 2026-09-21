@@ -1,123 +1,93 @@
-html {
-  font-size: 14px;
+:root{
+  --bg: #fbfdff;
+  --muted: #6b7280;
+  --text: #0f172a;
+  --accent: #0ea5a4; /* subtle teal accent */
+  --container-max: 1100px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
+html{
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
   height: 100%;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+body{
+  margin: 0;
+  padding: 0 0 40px 0;
+  min-height: 100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* Centered content width for a clean reading line */
+.content-wrapper{
+  max-width: var(--container-max);
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.25rem;
 }
 
-/* Background */
-body {
-    margin-bottom: 60px;
-    background: linear-gradient(135deg, #f5f7fa, #e4e8ef);
-    min-height: 100vh;
+/* Minimal navbar */
+.navbar{
+  background: transparent !important;
+  box-shadow:none !important;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.navbar-brand{
+  font-weight:600;
+  color:var(--text) !important;
+}
+.navbar .nav-link{
+  color:var(--muted) !important;
+  font-weight:500;
+}
+.navbar .nav-link.active, .navbar .nav-link:hover{
+  color:var(--text) !important;
 }
 
-/* Card styling */
-.card {
-    border-radius: 12px;
-    animation: fadeIn 0.4s ease-in-out;
+/* Cards and panels */
+.card{
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 10px;
+  background: #fff;
 }
+.card-body{padding:1.25rem}
 
-.card-body {
-    padding: 2rem;
+/* Buttons: flat, subtle shadow on hover */
+.btn-primary{
+  background: var(--accent);
+  border-color: transparent;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  box-shadow:none;
 }
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(14,165,164,0.08)}
 
-.shadow-sm {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+/* Forms */
+.form-control{border-radius:8px}
+.form-control:focus{box-shadow:0 0 0 0.15rem rgba(14,165,164,0.12); border-color:rgba(14,165,164,0.6)}
+
+/* Tables: minimal lines */
+table{
+  border-collapse:collapse;
+  width:100%;
 }
+table thead th{border-bottom:1px solid rgba(15,23,42,0.06); color:var(--muted); font-weight:600; padding:0.75rem}
+table tbody td{padding:0.7rem; border-bottom:1px solid rgba(15,23,42,0.04)}
 
-/* Inputs */
-.form-control:focus {
-    border-color: #4f8cff;
-    box-shadow: 0 0 0 0.2rem rgba(79, 140, 255, 0.25);
-}
+/* Footer */
+.footer{border-top:1px solid rgba(15,23,42,0.04); margin-top:2rem}
+.footer .text-muted{color:var(--muted)}
 
-/* Floating labels */
-.form-floating > label {
-    opacity: 0.75;
-}
+/* Small helpers */
+.small-muted{color:var(--muted); font-size:0.9rem}
 
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-    opacity: 1;
-}
-
-/* Button */
-.btn-primary {
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-/* Password toggle button */
-#togglePasswordBtn {
-    font-size: 0.8rem;
-    padding: 2px 8px;
-    border-radius: 6px;
-}
-
-/* Links */
-a {
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Error text */
-.text-danger.small {
-    font-size: 0.8rem;
-}
-
-/* Navbar */
-.navbar {
-    background-color: #1f2937; /* dark slate */
-}
-
-.navbar .nav-link,
-.navbar-brand {
-    color: #f9fafb !important;
-}
-
-.navbar .nav-link:hover {
-    color: #93c5fd !important;
-}
-
-/* Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Reduced animation for professionalism */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important}
 }
