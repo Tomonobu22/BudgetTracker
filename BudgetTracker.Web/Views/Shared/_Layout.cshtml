@@ -10,62 +10,60 @@
     <script type="importmap"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BudgetTracker.styles.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BudgetTracker</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+        <nav class="navbar navbar-expand-md bg-transparent py-3 mb-4" data-bs-theme="light">
+            <div class="container">
+                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">BudgetTracker</a>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                    <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Home")">Overview</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Income")">Income</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Income")">Income</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Expense")">Expense</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Expense")">Expense</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Investment")">Investment</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Investment")">Investment</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Tag")">Tag</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Tag")">Tag</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Import")">Import</a>
+                            <li class="nav-item px-2">
+                                <a class="nav-link" href="@Url.Action("Index", "Import")">Import</a>
                             </li>
-@*                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="@Url.Action("Index", "Report")">Reports</a>
-                            </li> *@
-@*                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>    *@
                         }
-                        <partial name="_LoginPartial" />
                     </ul>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <partial name="_LoginPartial" />
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container flex-grow-1">
-        <main role="main" class="pb-3">
+    <div class="container flex-grow-1 content-wrapper">
+        <main role="main" class="pb-4">
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - BudgetTracker
+        <div class="container text-center small text-muted py-3">
+            &copy; @DateTime.Now.Year - BudgetTracker
         </div>
     </footer>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
