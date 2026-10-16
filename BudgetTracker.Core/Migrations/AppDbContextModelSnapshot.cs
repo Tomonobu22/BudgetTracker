@@ -142,10 +142,6 @@ namespace BudgetTracker.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("CurrentValue")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -156,8 +152,19 @@ namespace BudgetTracker.Migrations
                     b.Property<int?>("ImportId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("PurchasePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("TagId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Ticker")
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -166,6 +173,8 @@ namespace BudgetTracker.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TagId");
+
+                    b.HasIndex("Ticker");
 
                     b.ToTable("Investments");
                 });
@@ -204,6 +213,28 @@ namespace BudgetTracker.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("BudgetTracker.Core.Models.StockPrice", b =>
+                {
+                    b.Property<string>("Ticker")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Ticker");
+
+                    b.ToTable("StockPrices");
                 });
 
             modelBuilder.Entity("BudgetTracker.Core.Models.Tag", b =>
@@ -456,6 +487,13 @@ namespace BudgetTracker.Migrations
                     b.HasOne("BudgetTracker.Core.Models.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId");
+
+                    b.HasOne("BudgetTracker.Core.Models.StockPrice", "StockPrice")
+                        .WithMany()
+                        .HasForeignKey("Ticker")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("StockPrice");
 
                     b.Navigation("Tag");
                 });

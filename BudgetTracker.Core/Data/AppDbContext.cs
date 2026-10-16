@@ -18,6 +18,7 @@ namespace BudgetTracker.Core.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Import> Imports { get; set; }
+        public DbSet<StockPrice> StockPrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,6 +29,11 @@ namespace BudgetTracker.Core.Data
                 .Property(t => t.Context)
                 .HasConversion<string>();
 
+            builder.Entity<Investment>()
+                .HasOne(i => i.StockPrice)
+                .WithMany()
+                .HasForeignKey(i => i.Ticker)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // 18 number of digits which 2 are after decimal point
             builder.Entity<Expense>()
@@ -39,7 +45,11 @@ namespace BudgetTracker.Core.Data
                 .HasPrecision(18, 2);
 
             builder.Entity<Investment>()
-                .Property(i => i.Amount)
+                .Property(i => i.PurchasePrice)
+                .HasPrecision(18, 2);
+
+            builder.Entity<Investment>()
+                .Property(i => i.Quantity)
                 .HasPrecision(18, 2);
 
             builder.Entity<Investment>()

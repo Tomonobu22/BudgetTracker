@@ -108,7 +108,7 @@ namespace BudgetTracker.Core.Services.Implementations
             }
 
             var totalCount = await investment.CountAsync();
-            var totalAmount = await investment.SumAsync(i => i.Amount);
+            var totalAmount = await investment.SumAsync(i => i.PurchasePrice * i.Quantity);
 
             var items = await investment
                 .OrderByDescending(i => i.DateInvested)
