@@ -66,14 +66,17 @@ namespace BudgetTracker.Core.Services.Implementations
 
             var monthlyIncome = await _incomeRepository.GetMonthlyIncomeAsync(userId, year);
             var monthlyExpense = await _expenseRepository.GetMonthlyExpenseAsync(userId, year);
-            var monthlyInvestment = await _investmentRepository.GetMonthlyInvestmentAsync(userId, year);
+
+            // Single repository call to fetch both invested amounts and current values per month
+            var (monthlyInvestment, monthlyInvestmentCurrent) = await _investmentRepository.GetMonthlyInvestmentSummaryAsync(userId, year);
             
             var result = new MonthlySummaryViewModel
             {
                 Year = year,
                 MonthlyIncome = monthlyIncome,
                 MonthlyExpenses = monthlyExpense,
-                MonthlyInvestments = monthlyInvestment
+                MonthlyInvestments = monthlyInvestment,
+                MonthlyInvestmentCurrent = monthlyInvestmentCurrent
             };
 
             // Cache the result for 10 minutes

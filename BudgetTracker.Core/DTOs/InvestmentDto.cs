@@ -15,5 +15,6 @@ namespace BudgetTracker.Core.DTOs
         public decimal CurrentValue { get; set; }
         public int? ImportId { get; set; }
         public decimal TotalInvestment => PurchasePrice * Quantity;
+        public decimal PercentageChange => CurrentValue != 0  && TotalInvestment != 0 ? ((CurrentValue - TotalInvestment) / TotalInvestment) * 100 : 0;
     }
 }
