@@ -48,7 +48,7 @@ namespace BudgetTracker.Core.Services.Implementations
             var cachedTags = _cacheService.Get<IEnumerable<TagDto>>(cacheKey);
             if (cachedTags != null)
             {
-                _logger.LogDebug($"Cache hit {cacheKey}");
+                //_logger.LogDebug($"Cache hit {cacheKey}");
                 return cachedTags;
             }
 

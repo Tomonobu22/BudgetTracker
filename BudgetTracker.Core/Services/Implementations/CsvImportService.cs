@@ -154,7 +154,8 @@ namespace BudgetTracker.Core.Services.Implementations
                 {
                     DateInvested = DateTime.TryParse(values[0], out var date) ? date : DateTime.MinValue,
                     TagId = tag.Id,
-                    Amount = decimal.TryParse(values[2], out var amount) ? amount : 0,
+                    PurchasePrice = decimal.TryParse(values[2], out var purchasePrice) ? purchasePrice : 0,
+                    Quantity = decimal.TryParse(values[3], out var quantity) ? quantity : 0,
                     UserId = userId,
                     ImportId = importId
                 }

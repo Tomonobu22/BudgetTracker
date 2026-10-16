@@ -12,13 +12,21 @@
                 Type
             </th>
             <th>
-                Amount
+                Ticker
+            <th>
+                Purchase Price
             </th>
             <th>
-                Date Invested
+                Quantity
+            </th>
+            <th>
+                Total Invested
             </th>
             <th>
                 Current Value
+            </th>
+            <th>
+                Date Invested
             </th>
             <th>Actions</th>
         </tr>
@@ -27,11 +35,33 @@
         @foreach (var item in Model.Items)
         {
             <tr>
-                <td style="width: 20%;">@item.Tag?.Name</td>
-                <td style="width: 20%;">@item.Amount.ToString("C")</td>
-                <td style="width: 20%;">@item.DateInvested.ToShortDateString()</td>
-                <td style="width: 20%;">@item.CurrentValue.ToString("C")</td>
+                <td style="width: 10%;">@item.Tag?.Name</td>
+                <td style="width: 10%;">@item.StockPrice?.Ticker</td>
+                <td style="width: 10%;">@item.PurchasePrice.ToString("C")</td>
+                <td style="width: 10%;">@item.Quantity.ToString("N2")</td>
+                <td style="width: 13%;">@item.TotalInvestment.ToString("C")</td>
                 <td style="width: 20%;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="me-3">@item.CurrentValue.ToString("C")</div>
+
+                        @{
+                            var change = item.PercentageChange;
+                            var changeClass = change > 0 ? "text-success" : change < 0 ? "text-danger" : "text-dark";
+                            var icon = change > 0 ? "bi-arrow-up" : change < 0 ? "bi-arrow-down" : "bi-dash";
+                            var sign = change > 0 ? "+" : "";
+                        }
+
+                        <div class="text-end" style="min-width:6.5rem;">
+                            <span class="d-inline-flex align-items-center @changeClass" title="@($"{change:N2}%")" aria-live="polite">
+                                <i class="bi @icon" aria-hidden="true"></i>
+                                <span class="ms-1 font-monospace">@sign@change.ToString("N2")%</span>
+                                <span class="visually-hidden">@((change > 0) ? " increase" : (change < 0) ? " decrease" : " no change")</span>
+                            </span>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 15%;">@item.DateInvested.ToShortDateString()</td>
+                <td style="width: 12%;">
                     <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#editModal" data-id="@item.Id" title="Edit"><i class="bi bi-pencil-square"></i></button>
                     <form asp-action="Delete"
                           asp-route-id="@item.Id"

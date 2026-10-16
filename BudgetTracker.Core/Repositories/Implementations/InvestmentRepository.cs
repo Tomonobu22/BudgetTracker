@@ -14,6 +14,7 @@ namespace BudgetTracker.Core.Repositories.Implementations
             return await _dbSet
                 .Where(i => i.UserId == userId)
                 .Include(i => i.Tag)
+                .Include(i => i.StockPrice)
                 .OrderByDescending(i => i.DateInvested)
                 .ToListAsync();
         }
@@ -21,7 +22,7 @@ namespace BudgetTracker.Core.Repositories.Implementations
         public async Task<decimal> GetTotalInvestmentAsync(string userId, DateTime startDate, DateTime endDate)
         {
             return await _dbSet.Where(i => i.UserId == userId && i.DateInvested >= startDate && i.DateInvested <= endDate)
-                .SumAsync(i => i.Amount);
+                .SumAsync(i => i.PurchasePrice * i.Quantity);
         }
 
         public async Task<List<decimal>> GetMonthlyInvestmentAsync(string userId, int year)
@@ -33,15 +34,50 @@ namespace BudgetTracker.Core.Repositories.Implementations
             foreach (var investment in investments)
             {
                 int monthIndex = investment.DateInvested.Month - 1;
-                monthlyInvestment[monthIndex] += investment.Amount;
+                monthlyInvestment[monthIndex] += investment.PurchasePrice * investment.Quantity;
             }
             return monthlyInvestment;
+        }
+
+        public async Task<List<decimal>> GetMonthlyCurrentValueAsync(string userId, int year)
+        {
+            var monthlyCurrent = new List<decimal>(new decimal[12]);
+            var investments = await _dbSet
+                .Where(i => i.UserId == userId && i.DateInvested.Year == year)
+                .ToListAsync();
+            foreach (var investment in investments)
+            {
+                int monthIndex = investment.DateInvested.Month - 1;
+                // Use CurrentValue property which is expected to represent the current total value for that investment
+                monthlyCurrent[monthIndex] += investment.CurrentValue;
+            }
+            return monthlyCurrent;
+        }
+
+        public async Task<(List<decimal> Invested, List<decimal> Current)> GetMonthlyInvestmentSummaryAsync(string userId, int year)
+        {
+            var monthlyInvested = new List<decimal>(new decimal[12]);
+            var monthlyCurrent = new List<decimal>(new decimal[12]);
+
+            var investments = await _dbSet
+                .Where(i => i.UserId == userId && i.DateInvested.Year == year)
+                .ToListAsync();
+
+            foreach (var investment in investments)
+            {
+                int monthIndex = investment.DateInvested.Month - 1;
+                monthlyInvested[monthIndex] += investment.PurchasePrice * investment.Quantity;
+                monthlyCurrent[monthIndex] += investment.CurrentValue;
+            }
+
+            return (monthlyInvested, monthlyCurrent);
         }
 
         public override async Task<Investment?> GetByIdAsync(int id)
         {
             return await _dbSet
                 .Include(i => i.Tag)
+                .Include(i => i.StockPrice)
                 .FirstOrDefaultAsync(i => i.Id == id);
         }
         public override async Task AddAsync(Investment investment)
@@ -82,7 +118,7 @@ namespace BudgetTracker.Core.Repositories.Implementations
 
         public IQueryable<Investment> Query(string userId)
         {
-            return _dbSet.Where(i => i.UserId == userId).Include(i => i.Tag);
+            return _dbSet.Where(i => i.UserId == userId).Include(i => i.Tag).Include(i => i.StockPrice);
         }
     }
 }

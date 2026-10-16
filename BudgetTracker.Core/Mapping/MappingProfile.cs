@@ -16,7 +16,10 @@ namespace BudgetTracker.Core.Mapping
                 .ForMember(dest => dest.Tag, opt => opt.Ignore());
             CreateMap<Investment, InvestmentDto>();
             CreateMap<InvestmentDto, Investment>()
-                .ForMember(dest => dest.Tag, opt => opt.Ignore());
+                .ForMember(dest => dest.Tag, opt => opt.Ignore())
+                .ForMember(dest => dest.StockPrice, opt => opt.Ignore());
+            CreateMap<StockPrice, StockPriceDto>();
+            CreateMap<StockPriceDto, StockPrice>();
             CreateMap<Tag, TagDto>().ReverseMap();
             CreateMap<Import, ImportDto>().ReverseMap();
         }

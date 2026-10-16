@@ -40,6 +40,8 @@ builder.Services.AddScoped<IImportQueueService, ImportQueueService>();
 builder.Services.AddScoped<IImportProcessingService, ImportProcessingService>();
 builder.Services.AddScoped<ICsvImportService, CsvImportService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<IStockPriceRepository, StockPriceRepository>();
+builder.Services.AddScoped<IStockPriceAppService, StockPriceAppService>();
 
 // Token Validation Parameters
 var tokenValidationParameters = new TokenValidationParameters

@@ -14,11 +14,15 @@ namespace BudgetTracker.Controllers
     {
         private readonly IInvestmentAppService _investmentAppService;
         private readonly ITagAppService _tagAppService;
+        private readonly IStockPriceAppService _stockPriceAppService;
 
-        public InvestmentController(IInvestmentAppService investmentAppService, ITagAppService tagAppService)
+        public InvestmentController(IInvestmentAppService investmentAppService, 
+                                    ITagAppService tagAppService,
+                                    IStockPriceAppService stockPriceAppService)
         {
             _investmentAppService = investmentAppService;
             _tagAppService = tagAppService;
+            _stockPriceAppService = stockPriceAppService;
         }
 
         private string? CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,6 +33,8 @@ namespace BudgetTracker.Controllers
             // For add new
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
+            var tickers = await _stockPriceAppService.GetAllAsync();
+            ViewBag.Tickers = new SelectList(tickers, "Ticker", "Ticker");
 
             var investments = await _investmentAppService.GetPagedByUserAsync(CurrentUserId, new PagingRequestDto { PageNumber = page, PageSize = 10 });
             var types = tags.Result.Select(i => i.Name).Distinct().ToList();
@@ -55,7 +61,7 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
+        public async Task<IActionResult> Create([Bind("Id,TagId,Ticker,PurchasePrice,Quantity,DateInvested")] InvestmentDto investment, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {
@@ -72,6 +78,19 @@ namespace BudgetTracker.Controllers
             {
                 return View(investment);
             }
+
+            // Add current value to the investment object before updating
+            var stockPrice = await _stockPriceAppService.GetByTickerAsync(investment.Ticker);
+            if (stockPrice != null)
+            {
+                investment.CurrentValue = stockPrice.Price * investment.Quantity;
+            }
+            else
+            {
+                ModelState.AddModelError("Ticker", "Invalid ticker symbol.");
+                return View(investment);
+            }
+
             await _investmentAppService.CreateAsync(investment, CurrentUserId);
             return RedirectToAction(nameof(Index));
         }
@@ -90,6 +109,9 @@ namespace BudgetTracker.Controllers
             }
             var tags = _tagAppService.GetAllTagsAsync(RecordType.Investment, CurrentUserId);
             ViewBag.Tags = new SelectList(tags.Result, "Id", "Name");
+            var tickers = await _stockPriceAppService.GetAllAsync();
+            ViewBag.Tickers = new SelectList(tickers, "Ticker", "Ticker");
+
             return PartialView("_EditModal", investment);
         }
 
@@ -98,7 +120,7 @@ namespace BudgetTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Amount,DateInvested,CurrentValue")] InvestmentDto investment, string? newTagName)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TagId,Ticker,PurchasePrice,Quantity,DateInvested")] InvestmentDto investment, string? newTagName)
         {
             if (!string.IsNullOrEmpty(newTagName))
             {
@@ -118,6 +140,18 @@ namespace BudgetTracker.Controllers
 
             if (!ModelState.IsValid)
             {
+                return View(investment);
+            }
+
+            // Add current value to the investment object before updating
+            var stockPrice = await _stockPriceAppService.GetByTickerAsync(investment.Ticker);
+            if (stockPrice != null)
+            {
+                investment.CurrentValue = stockPrice.Price * investment.Quantity;
+            }
+            else
+            {
+                ModelState.AddModelError("Ticker", "Invalid ticker symbol.");
                 return View(investment);
             }
 
